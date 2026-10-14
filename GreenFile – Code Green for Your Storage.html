@@ -1,0 +1,3031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>GreenFile – Code Green for Your Storage</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="GreenFile - Smart digital storage cleanup and green computing impact calculator for local disks.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌱</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      
+      /* Color Palette */
+      --deep: #05291f;
+      --dark: #0a3d2e;
+      --mid: #105943;
+      --em: #10b981;
+      --br: #22c55e;
+      --br-glow: rgba(34, 197, 94, 0.25);
+      --mint: #86efac;
+      --mint-bg: #ecfdf5;
+      --mint-border: #a7f3d0;
+      --paper: #f6f8f5;
+      --surface: #ffffff;
+      --surface-alt: #f1f5ee;
+      --surface-subtle: #fafbf9;
+      --border: #d4ded7;
+      --border-strong: #05291f;
+      
+      --tx: #052017;
+      --tx-dim: #3d5a4f;
+      --tx-muted: #6b897e;
+      --tx-light: #ffffff;
+      
+      --red: #e11d48;
+      --red-bg: #fff1f2;
+      --red-border: #fecdd3;
+      --amb: #d97706;
+      --amb-bg: #fffbeb;
+      --amb-border: #fde68a;
+      --blue: #0284c7;
+      --blue-bg: #f0f9ff;
+      --blue-border: #bae6fd;
+      
+      /* Typography */
+      --font-display: 'Space Grotesk', system-ui, sans-serif;
+      --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+      
+      /* Geometry */
+      --radius-xs: 4px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 22px;
+      --radius-full: 9999px;
+      
+      /* Shadows */
+      --shadow-sm: 0 1px 3px rgba(5, 41, 31, 0.05);
+      --shadow-md: 0 4px 14px rgba(5, 41, 31, 0.08);
+      --shadow-lg: 0 12px 28px rgba(5, 41, 31, 0.12);
+      --shadow-neo: 4px 4px 0 var(--border-strong);
+      --shadow-neo-sm: 2px 2px 0 var(--border-strong);
+      --shadow-neo-lg: 6px 6px 0 var(--border-strong);
+      --shadow-neo-accent: 4px 4px 0 var(--br);
+    }
+    
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--tx);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.6;
+      background-color: var(--paper);
+      background-image: 
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 36px 36px;
+      background-position: -1px -1px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    svg.i {
+      width: 1.15em;
+      height: 1.15em;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vertical-align: -0.2em;
+    }
+    
+    /* Typography Utilities */
+    h1, h2, h3, h4 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--tx);
+      letter-spacing: -0.02em;
+    }
+    .huge { font-size: clamp(38px, 6vw, 76px); line-height: 1.05; }
+    .xl { font-size: clamp(28px, 4vw, 52px); line-height: 1.1; }
+    .lg { font-size: clamp(20px, 2.5vw, 32px); }
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 0 28px; width: 100%; }
+    .sec { padding: 64px 0; }
+    .page { padding: 48px 0 96px; }
+    
+    .lbl {
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--mid);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .lbl.mint { color: var(--mint); }
+    .lbl.dim { color: var(--tx-dim); }
+    
+    .case {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 2px;
+      font-weight: 700;
+      color: var(--mid);
+      margin-bottom: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge {
+      background: var(--amb-bg);
+      color: var(--amb);
+      border: 1px solid var(--amb-border);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 3px 8px;
+      border-radius: var(--radius-xs);
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .badge.green {
+      background: var(--mint-bg);
+      color: var(--mid);
+      border-color: var(--mint-border);
+    }
+    
+    .quote {
+      font-size: 17px;
+      color: var(--tx-dim);
+      margin: 12px 0 28px;
+      font-weight: 500;
+    }
+    
+    /* Header / Navbar */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      background: rgba(246, 248, 245, 0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1.5px solid var(--border);
+      transition: all 0.2s ease;
+    }
+    .brand {
+      font-family: var(--font-display);
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      font-size: 18px;
+      margin-right: auto;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      cursor: pointer;
+      color: var(--deep);
+      user-select: none;
+    }
+    .brand .brand-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: var(--deep);
+      color: var(--br);
+      border-radius: var(--radius-sm);
+    }
+    
+    .nav-tabs {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--surface-alt);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+    .nav-tabs button {
+      all: unset;
+      cursor: pointer;
+      font-family: var(--font-display);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      color: var(--tx-dim);
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nav-tabs button:hover {
+      color: var(--deep);
+      background: rgba(16, 185, 129, 0.08);
+    }
+    .nav-tabs button.on {
+      background: var(--deep);
+      color: #ffffff;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    .status-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-right: 12px;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    .status-pill.active {
+      background: var(--mint-bg);
+      color: var(--dark);
+      border: 1px solid var(--mint-border);
+    }
+    .status-pill.active .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--br);
+      box-shadow: 0 0 8px var(--br);
+    }
+    .status-pill.browser {
+      background: var(--amb-bg);
+      color: var(--amb);
+      border: 1px solid var(--amb-border);
+    }
+    .status-pill.browser .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--amb);
+    }
+    
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1.5px solid var(--border-strong);
+      background: var(--br);
+      color: var(--deep);
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 12px 22px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: var(--shadow-neo);
+      text-decoration: none;
+      user-select: none;
+    }
+    .btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-neo-lg);
+    }
+    .btn:active {
+      transform: translate(0, 0);
+      box-shadow: var(--shadow-neo-sm);
+    }
+    .btn.l {
+      background: transparent;
+      color: var(--tx);
+      border-color: var(--border-strong);
+      box-shadow: none;
+    }
+    .btn.l:hover {
+      background: var(--surface-alt);
+      box-shadow: var(--shadow-neo-sm);
+    }
+    .btn.d {
+      background: var(--deep);
+      color: #ffffff;
+      border-color: var(--deep);
+      box-shadow: var(--shadow-neo-accent);
+    }
+    .btn.d:hover {
+      box-shadow: 6px 6px 0 var(--br);
+    }
+    .btn.r {
+      background: var(--red);
+      color: #ffffff;
+      border-color: var(--deep);
+    }
+    .btn.s {
+      padding: 7px 14px;
+      font-size: 11px;
+      border-radius: var(--radius-sm);
+      box-shadow: var(--shadow-neo-sm);
+    }
+    .btn.s:hover {
+      box-shadow: 4px 4px 0 var(--border-strong);
+    }
+    
+    /* Hero Section */
+    .hero {
+      background: var(--deep);
+      color: #ffffff;
+      position: relative;
+      overflow: hidden;
+      padding: 80px 0 90px;
+      background-image: 
+        radial-gradient(circle at 80% 20%, rgba(34, 197, 94, 0.18) 0%, transparent 50%),
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+      background-size: 100% 100%, 36px 36px, 36px 36px;
+      border-bottom: 2px solid var(--border-strong);
+    }
+    .hero .wrap {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+    .hero h1 {
+      color: #ffffff;
+      margin-top: 18px;
+    }
+    .hero p {
+      color: rgba(220, 252, 231, 0.85);
+      font-size: 18px;
+      line-height: 1.6;
+      max-width: 500px;
+      margin: 22px 0 32px;
+    }
+    .hero .btn {
+      box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.4);
+    }
+    .hero .btn.l {
+      border-color: rgba(255, 255, 255, 0.4);
+      color: #ffffff;
+    }
+    .hero .btn.l:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: #ffffff;
+    }
+    .g {
+      color: var(--br);
+      position: relative;
+      display: inline-block;
+    }
+    .g svg {
+      position: absolute;
+      left: 0;
+      bottom: -10px;
+      width: 100%;
+      height: 14px;
+    }
+    .g path {
+      stroke: var(--br);
+      stroke-width: 4;
+      fill: none;
+      stroke-linecap: round;
+      stroke-dasharray: 400;
+      stroke-dashoffset: 400;
+      animation: dr 1.2s 0.6s forwards;
+    }
+    @keyframes dr { to { stroke-dashoffset: 0; } }
+    
+    /* Stats Strip */
+    .strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      border-bottom: 2px solid var(--border-strong);
+      background: var(--surface);
+    }
+    .strip > div {
+      padding: 32px 28px;
+      border-right: 1.5px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .strip > div:last-child { border-right: none; }
+    .strip .n {
+      font-family: var(--font-display);
+      font-size: clamp(34px, 4vw, 54px);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-top: 8px;
+      color: var(--tx);
+    }
+    .strip .note {
+      font-size: 13px;
+      color: var(--tx-dim);
+      margin-top: 6px;
+    }
+    .b1 { background: var(--surface); }
+    .b2 { background: var(--mint-bg); }
+    .b3 { background: var(--surface-subtle); }
+    .b4 { background: #e8f5e9; }
+    
+    /* Cards */
+    .card {
+      border: 1.5px solid var(--border-strong);
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-neo);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+      box-shadow: var(--shadow-neo-lg);
+    }
+    .card.m {
+      background: var(--mint-bg);
+      border-color: var(--border-strong);
+    }
+    .card.alt {
+      background: var(--surface-alt);
+    }
+    .card.flat {
+      box-shadow: none;
+    }
+    
+    /* Problem Section */
+    .sus {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      margin-top: 36px;
+    }
+    .suspect {
+      border: 1.5px solid var(--border-strong);
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      position: relative;
+      box-shadow: var(--shadow-neo);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .suspect:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-neo-lg);
+    }
+    .suspect .no {
+      font-family: var(--font-display);
+      font-size: 54px;
+      font-weight: 800;
+      color: var(--mint-border);
+      line-height: 1;
+      margin-bottom: 14px;
+    }
+    
+    /* Mission Timeline */
+    .path {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 40px;
+      gap: 12px;
+      position: relative;
+    }
+    .path:before {
+      content: "";
+      position: absolute;
+      top: 32px;
+      left: 8%;
+      right: 8%;
+      border-top: 2px dashed var(--mid);
+      z-index: 1;
+    }
+    .node {
+      text-align: center;
+      flex: 1;
+      position: relative;
+      z-index: 2;
+    }
+    .node b {
+      display: flex;
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      background: var(--deep);
+      color: var(--br);
+      font-family: var(--font-display);
+      font-size: 20px;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid var(--paper);
+      box-shadow: var(--shadow-neo-sm);
+    }
+    .node:nth-child(even) b {
+      background: var(--em);
+      color: var(--deep);
+    }
+    .node h3 {
+      font-size: 15px;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Investigation Grid */
+    .inv {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-top: 28px;
+    }
+    .inv > div {
+      border: 1.5px solid var(--border-strong);
+      padding: 24px;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-neo);
+      transition: transform 0.2s ease;
+    }
+    .inv > div:hover {
+      transform: translateY(-2px);
+    }
+    .inv .n {
+      font-family: var(--font-display);
+      font-size: 38px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-top: 10px;
+      color: var(--tx);
+    }
+    
+    /* Dark Section Callouts */
+    .dark {
+      background: var(--deep);
+      color: #ffffff;
+      border-top: 2px solid var(--border-strong);
+      border-bottom: 2px solid var(--border-strong);
+    }
+    .dark h2, .dark h1, .dark h3 {
+      color: #ffffff;
+    }
+    .dark .quote {
+      color: var(--mint);
+    }
+    
+    /* Tables */
+    .tw {
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+      border: 1.5px solid var(--border-strong);
+      background: var(--surface);
+      box-shadow: var(--shadow-neo);
+      margin: 20px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      text-align: left;
+    }
+    th {
+      font-family: var(--font-display);
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--tx-dim);
+      background: var(--surface-alt);
+      padding: 14px 18px;
+      border-bottom: 1.5px solid var(--border-strong);
+    }
+    td {
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+    tbody tr:hover {
+      background: var(--mint-bg);
+    }
+    .td-name {
+      font-weight: 600;
+      color: var(--tx);
+      max-width: 380px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .td-mono {
+      font-family: var(--font-mono);
+      font-size: 13px;
+    }
+    
+    /* Toolbar / Inputs */
+    .tools {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: 22px 0;
+    }
+    select, input[type=search], input[type=text] {
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 11px 16px;
+      border: 1.5px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      color: var(--tx);
+      outline: none;
+      transition: all 0.15s ease;
+      box-shadow: var(--shadow-sm);
+    }
+    select:focus, input[type=search]:focus, input[type=text]:focus {
+      border-color: var(--em);
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+    }
+    input[type=search] {
+      min-width: 260px;
+      flex: 1;
+    }
+    
+    /* Segmented Controls (Keep / Delete) */
+    .seg {
+      display: inline-flex;
+      border: 1.5px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--surface);
+      box-shadow: var(--shadow-neo-sm);
+    }
+    .seg button {
+      all: unset;
+      cursor: pointer;
+      padding: 6px 14px;
+      font-family: var(--font-display);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      transition: all 0.15s ease;
+      text-align: center;
+    }
+    .seg button:hover {
+      background: var(--surface-alt);
+    }
+    .seg button.on {
+      background: var(--deep);
+      color: var(--br);
+    }
+    .seg button.on.x {
+      background: var(--red);
+      color: #ffffff;
+    }
+    
+    /* Duplicate Groups */
+    .grp {
+      display: grid;
+      grid-template-columns: 80px 1fr auto;
+      gap: 22px;
+      align-items: center;
+    }
+    .grp .no {
+      font-family: var(--font-display);
+      font-size: 54px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1;
+      color: var(--mid);
+    }
+    .fl {
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      align-items: center;
+      font-size: 14px;
+    }
+    .fl:last-child { border-bottom: none; }
+    
+    /* Priority Pills */
+    .pri {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      border: 1px solid currentColor;
+    }
+    .pri.high { color: var(--red); background: var(--red-bg); }
+    .pri.med { color: var(--amb); background: var(--amb-bg); }
+    .pri.low { color: var(--mid); background: var(--mint-bg); }
+    
+    /* Ranked Bars (Large Files) */
+    .rank {
+      display: grid;
+      grid-template-columns: 60px 1fr 140px;
+      gap: 20px;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .rank:last-child { border-bottom: none; }
+    .rank .no {
+      font-family: var(--font-display);
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--mid);
+    }
+    .bar {
+      height: 18px;
+      border: 1.5px solid var(--border-strong);
+      background: var(--surface-alt);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .bar i {
+      display: block;
+      height: 100%;
+      background: var(--em);
+      width: 0;
+      transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .bar.t { height: 32px; border-radius: var(--radius-md); }
+    
+    /* Impact & Metrics Grid */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      border: 2px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--surface);
+      box-shadow: var(--shadow-neo);
+      margin: 32px 0;
+    }
+    .metrics > div {
+      padding: 36px 30px;
+      border-right: 1.5px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .metrics > div:last-child { border-right: none; }
+    .metrics .n {
+      font-family: var(--font-display);
+      font-size: clamp(38px, 5vw, 64px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--tx);
+      margin-bottom: 8px;
+    }
+    
+    /* Before / After Comparison */
+    .ba {
+      display: grid;
+      grid-template-columns: 1fr 60px 1fr;
+      gap: 16px;
+      align-items: center;
+      margin-top: 24px;
+    }
+    .ba > div:nth-child(2) {
+      text-align: center;
+      font-size: 32px;
+      color: var(--em);
+    }
+    
+    /* Saved Big Banner */
+    .saved {
+      background: var(--br);
+      border: 2px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: 34px;
+      margin-top: 24px;
+      text-align: center;
+      box-shadow: var(--shadow-neo-lg);
+      color: var(--deep);
+    }
+    
+    /* Modals */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 41, 31, 0.75);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+      animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal .modal-card {
+      background: var(--surface);
+      border: 2px solid var(--border-strong);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      max-width: 580px;
+      width: 100%;
+      box-shadow: 10px 10px 0 var(--border-strong);
+      position: relative;
+      animation: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes scaleIn { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: var(--surface-alt);
+      border: 1.5px solid var(--border-strong);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--tx);
+      transition: all 0.15s ease;
+    }
+    .modal-close:hover {
+      background: var(--red);
+      color: #fff;
+      transform: scale(1.1);
+    }
+    
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      background: var(--surface);
+      border: 1.5px dashed var(--border-strong);
+      border-radius: var(--radius-lg);
+      margin: 24px 0;
+    }
+    .empty-state .empty-icon {
+      font-size: 44px;
+      margin-bottom: 14px;
+    }
+    .empty-state h3 {
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+    .empty-state p {
+      color: var(--tx-dim);
+      max-width: 440px;
+      margin: 0 auto 24px;
+    }
+    
+    /* Toast */
+    #toast {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 60;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .t {
+      background: var(--deep);
+      color: var(--br);
+      padding: 14px 20px;
+      border: 1.5px solid var(--br);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-neo);
+      font-family: var(--font-display);
+      font-size: 13px;
+      font-weight: 600;
+      animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes toastIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    
+    .hide { display: none !important; }
+    .pulse { animation: pl 1.5s infinite ease-in-out; }
+    @keyframes pl { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    
+    .chk {
+      color: var(--br);
+      display: inline-block;
+      width: 24px;
+      font-weight: 700;
+    }
+    .ck { opacity: 0.35; transition: opacity 0.3s ease; }
+    .ck.on { opacity: 1; font-weight: 600; }
+    
+    /* Mobile Responsiveness */
+    @media (max-width: 860px) {
+      nav {
+        flex-wrap: wrap;
+        padding: 10px 16px;
+      }
+      .brand { margin-bottom: 6px; }
+      .nav-tabs {
+        width: 100%;
+        overflow-x: auto;
+        padding: 4px;
+      }
+      .nav-tabs button {
+        padding: 6px 10px;
+        font-size: 11px;
+        white-space: nowrap;
+      }
+      .hero .wrap {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      .hero svg.art { display: none; }
+      .grp, .rank { grid-template-columns: 1fr; }
+      .wrap { padding: 0 18px; }
+      .path { flex-direction: column; gap: 20px; }
+      .path:before { display: none; }
+      .metrics > div {
+        border-right: none;
+        border-bottom: 1.5px solid var(--border);
+      }
+      .ba { grid-template-columns: 1fr; }
+      .ba > div:nth-child(2) { transform: rotate(90deg); }
+    }
+  </style>
+</head>
+<body>
+  <nav id="nav"></nav>
+  <main id="app"></main>
+  <div id="toast"></div>
+  <input type="file" id="picker" webkitdirectory multiple class="hide">
+
+  <script>
+    /* ===== GREENFILE CONFIGURATION ===== */
+    const CFG = {
+      ENERGY_PER_GB_FACTOR: 0.02, // kWh per GB per year
+      CO2_KG_PER_KWH: 0.475,      // kg CO2 per kWh (global grid average)
+      CAPACITY_GB: 50,
+      OLD_DAYS: 90,
+      LARGE_MB: 500,
+      MAX_FULL_HASH_MB: 256
+    };
+
+    const S = {
+      files: [],
+      dupFolders: [],
+      emptyFolders: [],
+      nameMatches: [],
+      dupTab: 'folders',
+      demo: false,
+      base: 0,
+      cap: 50e9,
+      view: 'home',
+      q: '',
+      flt: 'all',
+      sort: 'size',
+      lsort: 'size',
+      sel: { dup: 1, old: 1, temp: 1 },
+      done: null,
+      scanning: null,
+      hasData: false,
+      engineConnected: false,
+      serverInfo: null,
+      scannedFolder: ''
+    };
+
+    const NAV = [
+      ['home', 'Home'],
+      ['scan', 'Scan'],
+      ['dup', 'Duplicates'],
+      ['old', 'Unused'],
+      ['large', 'Large Files'],
+      ['clean', 'Cleanup'],
+      ['impact', 'Impact']
+    ];
+
+    const P = {
+      leaf: '<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>',
+      drive: '<path d="M22 12H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/><path d="M6 16h.01M10 16h.01"/>',
+      trash: '<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>',
+      archive: '<rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8M10 12h4"/>',
+      zap: '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l-1.92-6.02A1 1 0 0 0 11 14z"/>',
+      rec: '<path d="M7 19H4.8a1.8 1.8 0 0 1-1.6-2.7L5 13M11 19h6.2a1.8 1.8 0 0 0 1.6-2.7L17 13M14 16l-3 3 3 3M8.3 8 10 5a1.8 1.8 0 0 1 3.2 0l1.6 3"/>',
+      scan: '<path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/>',
+      cloud: '<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>',
+      files: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>',
+      check: '<polyline points="20 6 9 17 4 12"/>',
+      folder: '<path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/>'
+    };
+
+    const ic = n => `<svg class="i" viewBox="0 0 24 24">${P[n] || ''}</svg>`;
+    const CATS = {
+      Documents: 'pdf docx txt pptx xlsx rtf odt md csv',
+      Images: 'png jpg jpeg webp gif svg bmp tiff',
+      Videos: 'mp4 mkv avi mov wmv flv webm',
+      Audio: 'mp3 wav aac flac ogg m4a',
+      Archives: 'zip rar 7z tar gz bz2 iso',
+      Code: 'py js ts java c cpp html css json xml sql sh bat'
+    };
+
+    const $ = s => document.querySelector(s);
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const fmt = b => b >= 1e9 ? (b / 1e9).toFixed(2) + ' GB' : b >= 1e6 ? (b / 1e6).toFixed(1) + ' MB' : (b / 1e3).toFixed(0) + ' KB';
+    const ext = n => (n.split('.').pop() || '').toLowerCase();
+    const cat = n => {
+      const e = ext(n);
+      for (const k in CATS) {
+        if (CATS[k].split(' ').includes(e)) return k;
+      }
+      return 'Other';
+    };
+    
+    const toast = m => {
+      const d = document.createElement('div');
+      d.className = 't';
+      d.textContent = m;
+      $('#toast').append(d);
+      setTimeout(() => d.remove(), 3500);
+    };
+
+    const imp = b => {
+      const kwh = (b / 1e9) * CFG.ENERGY_PER_GB_FACTOR;
+      return { kwh, g: kwh * CFG.CO2_KG_PER_KWH * 1000 };
+    };
+
+    const ago = d => d >= 365 ? Math.floor(d / 365) + ' YEAR(S) AGO' : d >= 30 ? Math.floor(d / 30) + ' MONTH(S) AGO' : d + ' DAYS AGO';
+
+    /* ---------- Demo Data ---------- */
+    function demo() {
+      const D = 864e5;
+      const f = (name, mb, d, hash, tmp) => ({
+        name,
+        path: 'Demo/' + name,
+        size: mb * 1e6,
+        mod: Date.now() - d * D,
+        hash,
+        tmp,
+        id: 'f_' + Math.random().toString(36).slice(2, 10)
+      });
+      S.files = [
+        f('quarterly_report.pdf', 450, 200, 'h1'),
+        f('quarterly_report - Copy.pdf', 450, 15, 'h1'),
+        f('backup_quarterly_report.pdf', 450, 20, 'h1'),
+        f('training_dataset_2023.zip', 1800, 420),
+        f('raw_recording.mp4', 2400, 300, 'h3'),
+        f('raw_recording_backup.mp4', 2400, 120, 'h3'),
+        f('temporary_cache_build.zip', 600, 40, 0, 1),
+        f('~temp_cache.tmp', 220, 10, 0, 1),
+        f('research_thesis.docx', 12, 5),
+        f('archive_photos_2022.zip', 1400, 500),
+        f('neural_weights.pkl', 850, 60),
+        f('marketing_assets.zip', 620, 200),
+        f('course_lecture_01.mp4', 1200, 150),
+        f('meeting_notes.txt', 1, 3),
+        f('web_server.py', 0.05, 2),
+        f('vacation_beach.jpg', 8, 800, 'h4'),
+        f('vacation_beach (1).jpg', 8, 790, 'h4'),
+        f('legacy_installer.rar', 300, 400),
+        f('annual_budget.xlsx', 2, 100),
+        f('debug_session.log', 380, 30, 0, 1)
+      ];
+      S.dupFolders = [
+        {
+          id: 'df_1',
+          original: { name: 'Quarterly_Reports_2023', path: 'Demo/Projects/Quarterly_Reports_2023', relPath: 'Projects/Quarterly_Reports_2023', fileCount: 4, totalSize: 900e6 },
+          duplicates: [{ name: 'Quarterly_Reports_2023 - Copy', path: 'Demo/Projects/Quarterly_Reports_2023 - Copy', relPath: 'Projects/Quarterly_Reports_2023 - Copy', fileCount: 4, totalSize: 900e6 }],
+          fileCount: 4,
+          size: 900e6,
+          recoverableSize: 900e6
+        },
+        {
+          id: 'df_2',
+          original: { name: 'Raw_Video_Footage', path: 'Demo/Media/Raw_Video_Footage', relPath: 'Media/Raw_Video_Footage', fileCount: 2, totalSize: 4800e6 },
+          duplicates: [{ name: 'Raw_Video_Footage_Backup', path: 'Demo/Backups/Raw_Video_Footage_Backup', relPath: 'Backups/Raw_Video_Footage_Backup', fileCount: 2, totalSize: 4800e6 }],
+          fileCount: 2,
+          size: 4800e6,
+          recoverableSize: 4800e6
+        }
+      ];
+      S.emptyFolders = [
+        { name: 'Old_Drafts', path: 'Demo/Documents/Old_Drafts', relPath: 'Documents/Old_Drafts' },
+        { name: 'Cache_Export_Temp', path: 'Demo/Temp/Cache_Export_Temp', relPath: 'Temp/Cache_Export_Temp' }
+      ];
+      S.nameMatches = [
+        {
+          id: 'nm_1',
+          name: 'meeting_notes.txt',
+          files: [
+            { name: 'meeting_notes.txt', path: 'Demo/Documents/meeting_notes.txt', size: 1200, mod: Date.now() - 30 * 864e5 },
+            { name: 'meeting_notes (1).txt', path: 'Demo/Downloads/meeting_notes (1).txt', size: 1400, mod: Date.now() - 5 * 864e5 }
+          ]
+        }
+      ];
+      S.demo = true;
+      S.base = 19e9;
+      S.cap = CFG.CAPACITY_GB * 1e9;
+    }
+
+    /* ---------- Analysis & Stats ---------- */
+    function scoreOriginality(f) {
+      let score = 0;
+      const name = (f.name || '').toLowerCase();
+      if (/[-_\s]copy\b/i.test(name)) score -= 100;
+      if (/\(\d+\)/.test(name)) score -= 80;
+      if (/^copy\s+(?:of\s+)?/i.test(name)) score -= 100;
+      if (/backup/i.test(name)) score -= 40;
+      if (/temp|tmp/i.test(name)) score -= 50;
+      score -= (f.name || '').length;
+      return score;
+    }
+
+    function compute() {
+      const a = S.files.filter(f => !f.gone);
+      const g = {};
+      a.forEach(f => {
+        f.role = null;
+        f.gid = 0;
+        f.isOriginal = false;
+        if (f.hash) (g[f.hash] = g[f.hash] || []).push(f);
+      });
+      let n = 0;
+      Object.values(g).forEach(l => {
+        if (l.length < 2) return;
+        n++;
+        // Sort: genuine original first (clean filename, older creation/mod time)
+        l.sort((x, y) => (scoreOriginality(y) - scoreOriginality(x)) || (x.mod - y.mod));
+        l.forEach((f, i) => {
+          f.gid = n;
+          if (i === 0) {
+            f.isOriginal = true;
+          } else {
+            f.role = 'dup';
+          }
+        });
+      });
+      a.forEach(f => {
+        f.age = Math.floor((Date.now() - f.mod) / 864e5);
+        if (!f.isOriginal && !f.role && f.tmp) f.role = 'temp';
+        if (!f.isOriginal && !f.role && f.age > CFG.OLD_DAYS) f.role = 'old';
+        f.pri = f.role === 'dup' ? 'high' : f.role === 'temp' ? 'low' : f.role === 'old' ? (f.age > 365 ? 'high' : f.age > 180 ? 'med' : 'low') : '';
+        if (f.role && !f.act) f.act = 'delete';
+      });
+      return a;
+    }
+
+    function stats() {
+      const a = compute();
+      const s = { n: a.length, dup: 0, old: 0, tmp: 0, large: 0, useful: 0, files: 0 };
+      a.forEach(f => {
+        s.files += f.size;
+        if (f.role === 'dup') s.dup += f.size;
+        else if (f.role === 'temp') s.tmp += f.size;
+        else if (f.role === 'old') s.old += f.size;
+        else s.useful += f.size;
+        if (f.size >= CFG.LARGE_MB * 1e6) s.large += f.size;
+      });
+      s.used = s.files + S.base;
+      s.pot = s.dup + s.old + s.tmp;
+      s.eff = s.used ? Math.round((1 - s.pot / s.used) * 100) : 100;
+      return s;
+    }
+
+    const catBytes = r => S.files.filter(f => !f.gone && f.role === r && f.act !== 'keep').reduce((a, f) => a + f.size, 0);
+    const num = (v, d, u) => `<span class="cnt" data-v="${v}" data-d="${d}" data-u="${u}">0${u}</span>`;
+    const gb = b => num(b / 1e9, 1, ' GB');
+
+    /* ---------- Scanning Logic ---------- */
+    const STEPS = [
+      'Reading file directory metadata',
+      'Detecting duplicate content (SHA-256 Content Hash)',
+      'Auditing stale & unused files (>90 days)',
+      'Identifying storage-heavy files',
+      'Calculating environmental sustainability impact'
+    ];
+
+    const prog = (i, pct) => {
+      S.scanning = { i, pct };
+      S.view = 'scan';
+      render();
+    };
+
+    const wait = t => new Promise(r => setTimeout(r, t));
+
+    async function startScan(list) {
+      S.demo = false;
+      S.done = null;
+      prog(0, 8);
+      const isTmp = n => /\.(tmp|temp|log|bak|crdownload|cache)$/i.test(n) || n.startsWith('~') || n === '.DS_Store';
+      S.files = [...list].map(f => ({
+        name: f.name,
+        path: f.webkitRelativePath || f.name,
+        size: f.size,
+        mod: f.lastModified,
+        tmp: isTmp(f.name),
+        id: Math.random(),
+        file: f
+      }));
+      S.base = 0;
+      await wait(300);
+      prog(1, 30);
+      const bs = {};
+      S.files.forEach(f => (bs[f.size] = bs[f.size] || []).push(f));
+      const cand = Object.values(bs).filter(l => l.length > 1 && l[0].size > 0).flat();
+      let k = 0;
+      for (const f of cand) {
+        try {
+          const lim = CFG.MAX_FULL_HASH_MB * 1e6;
+          const b = f.size <= lim ? f.file : new Blob([f.file.slice(0, 4e6), f.file.slice(f.size - 4e6)]);
+          const h = await crypto.subtle.digest('SHA-256', await b.arrayBuffer());
+          f.hash = [...new Uint8Array(h)].map(x => x.toString(16).padStart(2, '0')).join('') + f.size;
+        } catch (e) {}
+        if (++k % 5 === 0) prog(1, 30 + Math.round((k / cand.length) * 40));
+      }
+      prog(2, 75);
+      await wait(300);
+      prog(3, 88);
+      await wait(300);
+      prog(4, 96);
+      await wait(300);
+      finish(Math.max(S.files.reduce((a, f) => a + f.size, 0) * 1.25, 1e9));
+    }
+
+    async function startDemo() {
+      S.done = null;
+      for (let i = 0; i < 5; i++) {
+        prog(i, [18, 38, 60, 82, 96][i]);
+        await wait(350);
+      }
+      demo();
+      finish(CFG.CAPACITY_GB * 1e9);
+    }
+
+    function finish(cap) {
+      S.scanning = null;
+      S.hasData = true;
+      S.view = 'home';
+      S.cap = S.demo ? CFG.CAPACITY_GB * 1e9 : cap;
+      render();
+      window.scrollTo(0, 0);
+      toast('✓ Scan complete – ' + S.files.length + ' files analyzed');
+    }
+
+    /* ---------- Reusable Component Helpers ---------- */
+    const art = `<svg class="art" viewBox="0 0 420 380" fill="none" stroke="#22C55E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="max-width: 380px; width: 100%; height: auto;">
+      <circle cx="210" cy="190" r="170" stroke-dasharray="3 9" opacity=".4"/>
+      <circle cx="210" cy="190" r="120" opacity=".2"/>
+      <path d="M130 150a40 40 0 0 1 12-77 52 52 0 0 1 100-12 46 46 0 0 1 16 90z" fill="#0A3D2E"/>
+      <rect x="110" y="215" width="200" height="90" rx="10" fill="#05291F"/>
+      <path d="M110 260h200"/>
+      <circle cx="135" cy="283" r="4" fill="#22C55E"/>
+      <circle cx="153" cy="283" r="4"/>
+      <path d="M215 138c-30 0-38-30-34-46 26 0 44 14 44 38z" fill="#10B981"/>
+      <path d="M215 138c0-16 6-28 18-36" stroke="#05291F"/>
+      <path d="M330 120a30 30 0 1 1-8 36M322 156l-2-14 14 4" stroke="#86EFAC"/>
+      <path d="M60 300c40 40 120 50 160 20" stroke-dasharray="2 8"/>
+      <path d="M260 330l-6-12 14 0" stroke="#86EFAC"/>
+    </svg>`;
+
+    const und = `<svg viewBox="0 0 300 16" preserveAspectRatio="none"><path d="M2 10C60 2 120 14 190 6S270 8 298 5"/></svg>`;
+
+    function hero(tag, title, sub) {
+      return `
+      <div class="hero">
+        <div class="wrap">
+          <div>
+            <div class="lbl mint">${ic('leaf')} ${tag}</div>
+            <h1 class="huge">${title}</h1>
+            <p>${sub}</p>
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              <button class="btn" onclick="pick()">Start Green Scan →</button>
+              <button class="btn l" onclick="startDemo()">Load Demo Mode</button>
+            </div>
+          </div>
+          <div style="text-align:center;">
+            ${art}
+          </div>
+        </div>
+      </div>`;
+    }
+
+    function strip(s) {
+      return `
+      <div class="strip">
+        <div class="b1">
+          <div class="lbl">${ic('files')} Files Scanned</div>
+          <div class="n">${num(s.n, 0, '')}</div>
+          <div class="note">${S.demo ? 'Demo Dataset' : 'Local Drive Analysis'}</div>
+        </div>
+        <div class="b2">
+          <div class="lbl">${ic('rec')} Duplicate Data</div>
+          <div class="n">${gb(s.dup)}</div>
+          <div class="note">Identical SHA-256 content</div>
+        </div>
+        <div class="b3">
+          <div class="lbl">${ic('trash')} Unused & Stale</div>
+          <div class="n">${gb(s.old + s.tmp)}</div>
+          <div class="note">> 90 days unmodified</div>
+        </div>
+        <div class="b4">
+          <div class="lbl">${ic('zap')} Potential Savings</div>
+          <div class="n">${gb(s.pot)}</div>
+          <div class="note">Drive Efficiency: <b>${s.eff}%</b></div>
+        </div>
+      </div>`;
+    }
+
+    function ring(s) {
+      const seg = [
+        ['Useful Active', s.useful, '#10b981'],
+        ['Duplicates', s.dup, '#05291f'],
+        ['Unused & Stale', s.old + s.tmp, '#86efac'],
+        ['Base System', S.base, '#cbd5e1']
+      ];
+      const T = seg.reduce((a, x) => a + x[1], 0) || 1;
+      let o = 0;
+      return `
+      <div style="display:flex;gap:28px;align-items:center;flex-wrap:wrap;padding:10px 0;">
+        <svg width="190" height="190" viewBox="0 0 120 120">
+          ${seg.map(x => {
+            const l = (x[1] / T) * 251.3;
+            const e = `<circle r="40" cx="60" cy="60" fill="none" stroke="${x[2]}" stroke-width="18" stroke-dasharray="${l} 251.3" stroke-dashoffset="${-o}" transform="rotate(-90 60 60)"/>`;
+            o += l;
+            return e;
+          }).join('')}
+          <circle r="49" cx="60" cy="60" fill="none" stroke="#05291f" stroke-width="0.8"/>
+          <circle r="31" cx="60" cy="60" fill="none" stroke="#05291f" stroke-width="0.8"/>
+        </svg>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          ${seg.map(x => `
+            <div style="font-size:14px;display:flex;align-items:center;gap:10px;">
+              <span style="display:inline-block;width:14px;height:14px;background:${x[2]};border:1.5px solid var(--border-strong);border-radius:3px;"></span>
+              <b>${x[0]}:</b> <span style="font-family:var(--font-mono);font-size:13px">${fmt(x[1])}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+    }
+
+    function bars(rows, tall) {
+      const m = Math.max(...rows.map(r => r[1]), 1);
+      return rows.map(r => `
+        <div style="margin:14px 0">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px" class="lbl">
+            <span style="color:var(--tx)">${r[0]}</span>
+            <span style="font-family:var(--font-mono);font-size:12px;font-weight:700">${fmt(r[1])}</span>
+          </div>
+          <div class="bar ${tall ? 't' : ''}">
+            <i data-w="${(r[1] / m) * 100}"></i>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    const need = () => S.hasData ? '' : `
+      <div class="empty-state">
+        <div class="empty-icon">📁</div>
+        <h3>No Folder Scanned Yet</h3>
+        <p>Select a folder on your drive or launch demo mode to inspect files and identify storage waste.</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <button class="btn d" onclick="pick()">Scan Folder</button>
+          <button class="btn" onclick="startDemo()">Load Demo Data</button>
+        </div>
+      </div>`;
+
+    const seg = f => `
+      <div style="display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span class="seg" title="Batch Cleanup Selection: Choose whether to mark this file for deletion or keep it">
+          <button class="${f.act === 'delete' ? 'on x' : ''}" onclick="setAct('${esc(f.id)}', 'delete')" title="Mark file for batch cleanup">
+            Mark Delete
+          </button>
+          <button class="${f.act === 'keep' ? 'on' : ''}" onclick="setAct('${esc(f.id)}', 'keep')" title="Keep file (exclude from cleanup)">
+            Keep
+          </button>
+        </span>
+        <button class="btn s r" onclick="deleteSingleFile('${esc(f.id)}')" title="Permanently delete this specific file immediately from disk" style="padding:6px 12px;font-size:11px;letter-spacing:0.5px">
+          🗑️ Delete Now
+        </button>
+      </div>`;
+
+    const head = (c, t, q) => `
+      <div class="case">
+        ${ic('folder')} CASE FILE / ${c}
+        ${S.demo ? '<span class="badge">DEMO DATA</span>' : '<span class="badge green">LOCAL DISK</span>'}
+      </div>
+      <h1 class="xl" style="margin-bottom:6px">${t}</h1>
+      <div class="quote">${q}</div>`;
+
+    /* ---------- Views ---------- */
+    function home() {
+      if (!S.hasData) {
+        return hero('Green Computing · Storage Efficiency', 'Make your digital <span class="g">storage greener.' + und + '</span>', 'Analyze redundant data, recover physical storage, and compute the environmental energy footprint of your files.') + problem() + mission() + why();
+      }
+      const s = stats();
+      return hero('Green Computing · Storage Efficiency', 'Make your digital <span class="g">storage greener.' + und + '</span>', 'Analyze redundant data, recover physical storage, and compute the environmental energy footprint of your files.') + strip(s) + problem() + mission() + `
+      <div class="wrap sec">
+        <div class="lbl">Investigation Summary</div>
+        <h2 class="xl" style="margin-top:10px">Where is your storage hiding?</h2>
+        <div class="inv">
+          <div>
+            <div class="lbl">${ic('rec')} Duplicates</div>
+            <div class="n">${gb(s.dup)}</div>
+            <p class="note" style="margin-top:8px">Identical files across folders</p>
+          </div>
+          <div>
+            <div class="lbl">${ic('trash')} Unused Files</div>
+            <div class="n">${gb(s.old)}</div>
+            <p class="note" style="margin-top:8px">> 90 days unopened</p>
+          </div>
+          <div>
+            <div class="lbl">${ic('drive')} Heavyweight Files</div>
+            <div class="n">${gb(s.large)}</div>
+            <p class="note" style="margin-top:8px">Individual files ≥ 500 MB</p>
+          </div>
+          <div>
+            <div class="lbl">${ic('files')} Temporary Items</div>
+            <div class="n">${gb(s.tmp)}</div>
+            <p class="note" style="margin-top:8px">Cache, .tmp, and logs</p>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:24px;margin-top:34px">
+          <div class="card">
+            <div class="lbl">Storage Allocation</div>
+            ${ring(s)}
+          </div>
+          <div class="card m">
+            <div class="lbl">Storage Reduction Potential</div>
+            ${bars([['Duplicates', s.dup], ['Unused Stale Files', s.old], ['Temporary Caches', s.tmp], ['Heavyweight Files', s.large]])}
+          </div>
+        </div>
+      </div>
+      <div class="dark">
+        <div class="wrap sec">
+          <div class="lbl mint">${ic('zap')} Recommended Cleanup Plan</div>
+          <h2 class="xl" style="margin:12px 0 10px">Every Gigabyte Has an Environmental Cost</h2>
+          <div style="font-size:24px;font-weight:700;color:var(--br);margin-bottom:20px">
+            Recommended Cleanup: ${gb(['dup', 'old', 'temp'].reduce((a, r) => a + (S.sel[r] ? catBytes(r) : 0), 0))}
+          </div>
+          <button class="btn" onclick="go('clean')">Review Cleanup Plan →</button>
+        </div>
+      </div>` + (S.done ? `<div class="wrap sec">${ba()}</div>` : '') + why();
+    }
+
+    function problem() {
+      return `
+      <div class="wrap sec">
+        <div class="lbl">The Hidden Storage Footprint</div>
+        <h2 class="xl" style="margin:12px 0 16px;max-width:850px">Your files may feel invisible. The energy and hardware storing them aren't.</h2>
+        <p style="max-width:660px;font-size:16px;color:var(--tx-dim)">
+          Digital storage requires constant power, data center infrastructure, and rare earth minerals. Removing redundant copies and obsolete files reduces unnecessary drive wear and lifecycle energy waste.
+        </p>
+        <div class="sus">
+          ${[
+            ['01', 'Duplicate Copies', 'Exact redundant duplicates across downloads and project folders consuming duplicate sectors.'],
+            ['02', 'Stale Forgotten Data', 'Files untouched for months or years that continue to occupy drive capacity.'],
+            ['03', 'Storage Heavyweights', 'Oversized logs, old ISOs, and raw video exports that disproportionately consume storage space.']
+          ].map(x => `
+            <div class="suspect">
+              <div class="no">${x[0]}</div>
+              <h3 style="font-size:22px;margin-bottom:8px">${x[1]}</h3>
+              <p style="color:var(--tx-dim);margin:0;font-size:14px">${x[2]}</p>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+    }
+
+    function mission() {
+      return `
+      <div class="wrap" style="padding-bottom:70px">
+        <div class="lbl">Workflow Protocol</div>
+        <div class="path">
+          ${[
+            ['01', 'Scan Disk'],
+            ['02', 'Investigate'],
+            ['03', 'Review Clean'],
+            ['04', 'Measure'],
+            ['05', 'Go Green']
+          ].map(x => `
+            <div class="node">
+              <b>${x[0]}</b>
+              <h3>${x[1]}</h3>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+    }
+
+    function why() {
+      return `
+      <div style="background:var(--surface-alt);border-top:1.5px solid var(--border);border-bottom:1.5px solid var(--border)">
+        <div class="wrap sec">
+          <div class="lbl">${ic('leaf')} Green Computing Fundamentals</div>
+          <h2 class="xl" style="margin:12px 0 16px">Responsible Storage Management</h2>
+          <p style="max-width:680px;font-size:16px;color:var(--tx-dim);line-height:1.7">
+            Green computing focuses on maximizing resource efficiency and minimizing digital waste. By systematically reclaiming drive space, GreenFile helps you prolong disk lifespans and cut down on physical storage bloat.
+          </p>
+        </div>
+      </div>`;
+    }
+
+    function scanV() {
+      if (S.scanning) {
+        const p = S.scanning;
+        return `
+        <div class="hero" style="min-height:80vh;display:flex;align-items:center">
+          <div class="wrap" style="grid-template-columns:1fr">
+            <div style="max-width:760px;margin:0 auto;width:100%">
+              <div class="lbl mint">${ic('scan')} GreenFile / Engine Scanning Protocol</div>
+              <h1 class="xl pulse" style="margin:16px 0 28px">Analyzing Local Drive Contents...</h1>
+              <div style="background:rgba(255,255,255,0.05);padding:24px;border-radius:var(--radius-lg);border:1px solid rgba(255,255,255,0.1)">
+                ${STEPS.map((t, i) => `
+                  <div class="ck ${i < p.i || p.pct >= 100 ? 'on' : i === p.i ? 'on pulse' : ''}" style="font-size:16px;margin:10px 0;display:flex;align-items:center;gap:10px">
+                    <span class="chk">${i < p.i || p.pct >= 100 ? '✓' : '›'}</span>
+                    <span>${t}</span>
+                  </div>
+                `).join('')}
+                <div class="bar t" style="margin:28px 0 12px;background:rgba(0,0,0,0.3);border-color:var(--br)">
+                  <i style="width:${p.pct}%;background:var(--br)"></i>
+                </div>
+                <div style="font-family:var(--font-display);font-size:36px;font-weight:700;color:var(--br);text-align:right">
+                  ${p.pct}%
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }
+
+      const l = S.files.filter(f => !f.gone && f.name.toLowerCase().includes(S.q.toLowerCase()) && flt(f)).sort(sorter(S.sort));
+      const cs = {};
+      S.files.filter(f => !f.gone).forEach(f => {
+        const c = cat(f.name);
+        cs[c] = (cs[c] || 0) + f.size;
+      });
+
+      return `
+      <div class="wrap page">
+        ${head('000', 'File Explorer & Inventory', 'Locally analyzed file system items. No data leaves your machine.')}
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px">
+          <button class="btn d" onclick="pick()">📂 Scan Folder</button>
+          <button class="btn" onclick="startDemo()">✨ Demo Mode</button>
+        </div>
+        ${S.hasData ? `
+          <div class="card m">
+            <div class="lbl">Storage by Content Type</div>
+            ${bars(Object.entries(cs).sort((a, b) => b[1] - a[1]))}
+          </div>
+          <div class="tools">
+            <input type="search" id="q" placeholder="🔍 Search scanned files..." value="${esc(S.q)}" oninput="S.q=this.value;render()">
+            <select onchange="S.flt=this.value;render()">
+              ${['all', 'dup', 'old', 'large', 'Documents', 'Images', 'Videos', 'Archives', 'Code'].map(x => `
+                <option value="${x}" ${S.flt === x ? 'selected' : ''}>
+                  ${{ all: 'All Files', dup: 'Duplicates Only', old: 'Unused Stale Files', large: 'Large Files (≥500MB)' }[x] || x}
+                </option>
+              `).join('')}
+            </select>
+            <select onchange="S.sort=this.value;render()">
+              ${[['size', 'Sort: Largest First'], ['old', 'Sort: Oldest First'], ['new', 'Sort: Newest First'], ['name', 'Sort: Name A–Z']].map(x => `
+                <option value="${x[0]}" ${S.sort === x[0] ? 'selected' : ''}>${x[1]}</option>
+              `).join('')}
+            </select>
+          </div>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>File Name</th>
+                  <th>Size</th>
+                  <th>Category</th>
+                  <th>Last Modified</th>
+                  <th>Cleanup Role</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${l.slice(0, 250).map(f => `
+                  <tr>
+                    <td class="td-name" title="${esc(f.path || f.name)}">${esc(f.name)}</td>
+                    <td class="td-mono">${fmt(f.size)}</td>
+                    <td><span class="badge">${cat(f.name)}</span></td>
+                    <td class="td-mono" style="color:var(--tx-dim)">${new Date(f.mod).toLocaleDateString()}</td>
+                    <td>
+                      ${f.role === 'dup' ? '<span class="badge" style="background:var(--red-bg);color:var(--red);border-color:var(--red-border)">Duplicate</span>' :
+                        f.role === 'old' ? '<span class="badge" style="background:var(--amb-bg);color:var(--amb);border-color:var(--amb-border)">Unused</span>' :
+                        f.role === 'temp' ? '<span class="badge" style="background:var(--blue-bg);color:var(--blue);border-color:var(--blue-border)">Temporary</span>' :
+                        f.gid ? '<span class="badge green">Original (Keep)</span>' : '<span style="color:var(--tx-muted)">Active</span>'}
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+          <div style="font-size:13px;color:var(--tx-muted);text-align:right">
+            Showing ${Math.min(l.length, 250)} of ${l.length} matching files
+          </div>
+        ` : need()}
+      </div>`;
+    }
+
+    const flt = f => S.flt === 'all' || (S.flt === 'dup' && (f.role === 'dup' || f.gid)) || (S.flt === 'old' && f.role === 'old') || (S.flt === 'large' && f.size >= CFG.LARGE_MB * 1e6) || cat(f.name) === S.flt;
+    const sorter = k => ({
+      size: (a, b) => b.size - a.size,
+      old: (a, b) => a.mod - b.mod,
+      new: (a, b) => b.mod - a.mod,
+      name: (a, b) => a.name.localeCompare(b.name)
+    }[k]);
+
+    function dupV() {
+      const a = compute().filter(f => f.gid);
+      const G = {};
+      a.forEach(f => (G[f.gid] = G[f.gid] || []).push(f));
+      const s = stats();
+      const dupFolderCount = S.dupFolders ? S.dupFolders.length : 0;
+      const dupFolderSize = S.dupFolders ? S.dupFolders.reduce((acc, df) => acc + (df.recoverableSize || 0), 0) : 0;
+      const emptyFolderCount = S.emptyFolders ? S.emptyFolders.length : 0;
+      const nameMatchCount = S.nameMatches ? S.nameMatches.length : 0;
+      const fileGroupCount = Object.keys(G).length;
+
+      if (!S.dupTab) {
+        S.dupTab = dupFolderCount > 0 ? 'folders' : 'files';
+      }
+
+      return `
+      <div class="wrap page">
+        ${head('001', 'Duplicate Detection Hub', 'Deep scan for duplicate directory trees, bit-for-bit file duplicates, and name-matched copies.')}
+        
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-bottom:24px">
+          <div class="card" style="margin:0;padding:18px;background:var(--surface);cursor:pointer;border-color:${S.dupTab === 'folders' ? 'var(--em)' : 'var(--border-strong)'}" onclick="S.dupTab='folders';render()">
+            <div class="lbl">📁 Duplicate Folders</div>
+            <div style="font-size:30px;font-family:var(--font-display);font-weight:700;color:var(--deep);margin:6px 0">${dupFolderCount}</div>
+            <div style="font-size:12px;color:var(--tx-muted)">${fmt(dupFolderSize)} recoverable</div>
+          </div>
+          <div class="card" style="margin:0;padding:18px;background:var(--surface);cursor:pointer;border-color:${S.dupTab === 'files' ? 'var(--em)' : 'var(--border-strong)'}" onclick="S.dupTab='files';render()">
+            <div class="lbl">📄 Exact File Duplicates</div>
+            <div style="font-size:30px;font-family:var(--font-display);font-weight:700;color:var(--deep);margin:6px 0">${fileGroupCount}</div>
+            <div style="font-size:12px;color:var(--tx-muted)">${fmt(s.dup)} recoverable</div>
+          </div>
+          <div class="card" style="margin:0;padding:18px;background:var(--surface);cursor:pointer;border-color:${S.dupTab === 'names' ? 'var(--em)' : 'var(--border-strong)'}" onclick="S.dupTab='names';render()">
+            <div class="lbl">🏷️ Name-Matched Copies</div>
+            <div style="font-size:30px;font-family:var(--font-display);font-weight:700;color:var(--deep);margin:6px 0">${nameMatchCount}</div>
+            <div style="font-size:12px;color:var(--tx-muted)">Identical or copy names</div>
+          </div>
+          <div class="card" style="margin:0;padding:18px;background:var(--surface);cursor:pointer;border-color:${S.dupTab === 'empty' ? 'var(--em)' : 'var(--border-strong)'}" onclick="S.dupTab='empty';render()">
+            <div class="lbl">🗂️ Empty Folders</div>
+            <div style="font-size:30px;font-family:var(--font-display);font-weight:700;color:var(--deep);margin:6px 0">${emptyFolderCount}</div>
+            <div style="font-size:12px;color:var(--tx-muted)">Zero-byte directories</div>
+          </div>
+        </div>
+
+        <!-- Sub-Navigation Switcher -->
+        <div style="display:flex;gap:10px;border-bottom:2px solid var(--border);padding-bottom:14px;margin-bottom:28px;flex-wrap:wrap">
+          <button class="btn s ${S.dupTab === 'folders' ? 'd' : 'l'}" onclick="S.dupTab='folders';render()">
+            📁 Duplicate Folders (${dupFolderCount})
+          </button>
+          <button class="btn s ${S.dupTab === 'files' ? 'd' : 'l'}" onclick="S.dupTab='files';render()">
+            📄 Exact File Duplicates (${fileGroupCount})
+          </button>
+          <button class="btn s ${S.dupTab === 'names' ? 'd' : 'l'}" onclick="S.dupTab='names';render()">
+            🏷️ Name-Matched Copies (${nameMatchCount})
+          </button>
+          <button class="btn s ${S.dupTab === 'empty' ? 'd' : 'l'}" onclick="S.dupTab='empty';render()">
+            🗂️ Empty Folders (${emptyFolderCount})
+          </button>
+        </div>
+
+        ${need()}
+
+        ${S.dupTab === 'folders' ? renderDupFolders(dupFolderSize) :
+          S.dupTab === 'files' ? renderDupFiles(G) :
+          S.dupTab === 'names' ? renderNameMatches() :
+          renderEmptyFolders()}
+      </div>`;
+    }
+
+    function renderDupFolders(totalRecoverable) {
+      if (!S.hasData) return '';
+      if (!S.dupFolders || !S.dupFolders.length) {
+        return `
+        <div class="empty-state">
+          <div class="empty-icon">📁</div>
+          <h3>🎉 No Duplicate Folders Found!</h3>
+          <p>None of the scanned directories are exact duplicates of another folder.</p>
+        </div>`;
+      }
+
+      return `
+      <div style="background:var(--mint-bg);border:1.5px solid var(--mint-border);border-radius:var(--radius-md);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:10px">
+        <div>
+          <b>Folder-Level Deduplication:</b> 
+          <span style="color:var(--tx-dim)">Identified full folder copies sharing the exact same directory structure and files.</span>
+        </div>
+        <div>
+          <span class="lbl">Recoverable Space:</span> 
+          <b style="font-size:18px;font-family:var(--font-mono);color:var(--mid)">${fmt(totalRecoverable)}</b>
+        </div>
+      </div>
+      ${S.dupFolders.map((df, idx) => `
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+            <div>
+              <span class="badge green">Duplicate Folder #${idx + 1}</span>
+              <h3 style="font-size:20px;margin:8px 0 4px">${esc(df.original.name)}</h3>
+              <div style="font-size:13px;color:var(--tx-muted)">
+                ${df.fileCount} file(s) &bull; ${fmt(df.size)} each
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div class="lbl">Recoverable</div>
+              <div style="font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--red)">
+                ${fmt(df.recoverableSize)}
+              </div>
+            </div>
+          </div>
+          
+          <div style="background:var(--surface-subtle);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;margin-bottom:14px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+              <span class="badge green">★ ORIGINAL PRESERVED</span>
+              <span style="font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--tx)">${esc(df.original.path)}</span>
+            </div>
+            ${df.duplicates.map(dup => `
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px dashed var(--border);flex-wrap:wrap;gap:10px">
+                <div>
+                  <span class="badge" style="background:var(--red-bg);color:var(--red);border-color:var(--red-border);margin-right:8px">DUPLICATE COPY</span>
+                  <span style="font-family:var(--font-mono);font-size:13px;color:var(--tx-dim)">${esc(dup.path)}</span>
+                </div>
+                <button class="btn s r" onclick="deleteFolder('${esc(dup.path)}')">
+                  🗑️ Delete Duplicate Folder
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('')}`;
+    }
+
+    function renderDupFiles(G) {
+      if (!S.hasData) return '';
+      const s = stats();
+      const keys = Object.keys(G);
+      if (!keys.length) {
+        return `
+        <div class="empty-state">
+          <div class="empty-icon">📄</div>
+          <h3>🎉 No Exact Duplicate Files Found!</h3>
+          <p>Your scanned directory does not contain redundant SHA-256 duplicate files.</p>
+        </div>`;
+      }
+
+      return `
+      <div style="background:var(--mint-bg);border:1.5px solid var(--mint-border);border-radius:var(--radius-md);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:10px">
+        <div>
+          <b>SHA-256 Bit-by-Bit Duplicates:</b> 
+          <span style="color:var(--tx-dim)">Original is automatically preserved; redundant copies marked for deletion.</span>
+        </div>
+        <div>
+          <span class="lbl">Recoverable Space:</span> 
+          <b style="font-size:18px;font-family:var(--font-mono);color:var(--mid)">${fmt(s.dup)}</b>
+        </div>
+      </div>
+      ${keys.map(id => {
+        const l = G[id];
+        const ex = l.filter(f => f.role === 'dup');
+        const rec = ex.reduce((x, f) => x + f.size, 0);
+        return `
+        <div class="card">
+          <div class="grp">
+            <div class="no">${String(id).padStart(2, '0')}</div>
+            <div>
+              <div class="lbl" style="margin-bottom:8px">File Duplicate Cluster #${id}</div>
+              ${l.map(f => `
+                <div class="fl">
+                  <span style="max-width:65%">
+                    ${f.isOriginal ? '<span style="color:#d97706">★</span> ' : ''}
+                    <b>${esc(f.name)}</b>
+                    ${f.isOriginal ? '<span class="badge green" style="margin-left:6px">★ Original (Preserved)</span>' : '<span class="badge" style="background:var(--red-bg);color:var(--red);border-color:var(--red-border);margin-left:6px">Duplicate Copy</span>'}
+                    <div style="font-size:12px;color:var(--tx-muted);margin-top:2px;font-family:var(--font-mono)">${esc(f.path || f.name)}</div>
+                  </span>
+                  <span>${f.isOriginal ? '<span class="badge green">KEEP ORIGINAL</span>' : seg(f)}</span>
+                </div>
+              `).join('')}
+              <div style="font-size:13px;color:var(--tx-dim);margin-top:10px">
+                Cluster file size: <b>${fmt(l[0].size)}</b> each &bull; ${l.length} copies
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div class="lbl">Recoverable</div>
+              <div style="font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--red);margin:6px 0">
+                ${fmt(rec)}
+              </div>
+              <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+                <button class="btn s l" onclick="grpAct(${id}, 'keep')">🛡️ Keep Cluster</button>
+                <button class="btn s r" onclick="deleteClusterDuplicates(${id})">🗑️ Delete Duplicates Now</button>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}`;
+    }
+
+    function renderNameMatches() {
+      if (!S.hasData) return '';
+      if (!S.nameMatches || !S.nameMatches.length) {
+        return `
+        <div class="empty-state">
+          <div class="empty-icon">🏷️</div>
+          <h3>No Name-Matched Copies</h3>
+          <p>No separate files share identical or copy filenames across folders.</p>
+        </div>`;
+      }
+
+      return `
+      <div style="background:var(--amb-bg);border:1.5px solid var(--amb-border);border-radius:var(--radius-md);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:10px">
+        <div>
+          <b>Similar & Name-Matched Files:</b> 
+          <span style="color:var(--tx-dim)">Files sharing identical or copy filenames (e.g. <code>(1)</code>, <code>- Copy</code>) across different folders.</span>
+        </div>
+      </div>
+      ${S.nameMatches.map((nm, idx) => `
+        <div class="card">
+          <div class="lbl">Name Match Cluster #${idx + 1}</div>
+          <h3 style="font-size:18px;margin:8px 0 12px">${esc(nm.name)}</h3>
+          ${nm.files.map(f => `
+            <div class="fl">
+              <span style="max-width:70%">
+                <b>${esc(f.name)}</b>
+                <span class="badge" style="margin-left:6px">${fmt(f.size)}</span>
+                <span style="font-size:12px;color:var(--tx-muted);margin-left:6px">Modified: ${new Date(f.mod).toLocaleDateString()}</span>
+                <div style="font-size:12px;color:var(--tx-muted);font-family:var(--font-mono);margin-top:2px">${esc(f.path || f.name)}</div>
+              </span>
+              <span>
+                <button class="btn s r" onclick="deleteSingleFile('${esc(f.id)}')">🗑️ Delete File</button>
+              </span>
+            </div>
+          `).join('')}
+        </div>
+      `).join('')}`;
+    }
+
+    function renderEmptyFolders() {
+      if (!S.hasData) return '';
+      if (!S.emptyFolders || !S.emptyFolders.length) {
+        return `
+        <div class="empty-state">
+          <div class="empty-icon">🗂️</div>
+          <h3>🎉 No Empty Folders Found!</h3>
+          <p>All directories in the scanned path contain at least one file.</p>
+        </div>`;
+      }
+
+      return `
+      <div style="background:var(--mint-bg);border:1.5px solid var(--mint-border);border-radius:var(--radius-md);padding:14px 20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:10px">
+        <div>
+          <b>Empty Directory Cleanup:</b> 
+          <span style="color:var(--tx-dim)">${S.emptyFolders.length} empty folder(s) found taking up filesystem index space.</span>
+        </div>
+        <button class="btn s r" onclick="deleteAllEmptyFolders()">
+          🗑️ Delete All Empty Folders (${S.emptyFolders.length})
+        </button>
+      </div>
+      <div class="card" style="padding:16px">
+        ${S.emptyFolders.map(ef => `
+          <div class="fl">
+            <div>
+              <b>📁 ${esc(ef.name)}</b>
+              <div style="font-family:var(--font-mono);font-size:12px;color:var(--tx-muted);margin-top:2px">${esc(ef.path || ef.relPath)}</div>
+            </div>
+            <button class="btn s r" onclick="deleteEmptyFolder('${esc(ef.path)}')">
+              Delete Folder
+            </button>
+          </div>
+        `).join('')}
+      </div>`;
+    }
+
+    function oldV() {
+      const a = compute().filter(f => f.role === 'old').sort((x, y) => y.age - x.age);
+      return `
+      <div class="wrap page">
+        ${head('002', 'Unused & Stale Files', 'Dormant files that haven’t been modified or accessed in months.')}
+        ${need()}
+        ${a.map(f => `
+          <div class="card" style="display:grid;grid-template-columns:2.5fr 1fr 1fr auto;gap:20px;align-items:center">
+            <div>
+              <div class="lbl" style="margin-bottom:4px">File Record</div>
+              <div style="font-size:17px;font-weight:700;margin-bottom:4px">${esc(f.name)}</div>
+              <div style="font-family:var(--font-mono);font-size:13px;color:var(--tx-muted)">${esc(f.path || f.name)}</div>
+              <div style="font-family:var(--font-mono);font-size:14px;color:var(--mid);font-weight:600;margin-top:4px">${fmt(f.size)}</div>
+            </div>
+            <div>
+              <div class="lbl">Last Modified</div>
+              <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;margin-top:4px">${ago(f.age)}</div>
+              <div style="font-size:12px;color:var(--tx-muted)">${new Date(f.mod).toLocaleDateString()}</div>
+            </div>
+            <div>
+              <div class="lbl">Priority</div>
+              <div style="margin-top:4px">
+                <span class="pri ${f.pri}">
+                  ${{ high: 'High (>1 yr)', med: 'Medium (6-12m)', low: 'Low (3-6m)' }[f.pri]}
+                </span>
+              </div>
+            </div>
+            <div>${seg(f)}</div>
+          </div>
+        `).join('') || (S.hasData ? '<div class="empty-state"><h3>🎉 No Stale Files Found!</h3><p>All scanned files have been modified recently within 90 days.</p></div>' : '')}
+      </div>`;
+    }
+
+    function largeV() {
+      const a = compute().filter(f => f.size >= CFG.LARGE_MB * 1e6).sort(sorter(S.lsort));
+      const m = Math.max(...a.map(f => f.size), 1);
+      return `
+      <div class="wrap page">
+        ${head('003', 'Storage Heavyweight Files', 'Individual high-capacity files consuming large contiguous storage blocks.')}
+        <div class="tools">
+          <select onchange="S.lsort=this.value;render()">
+            ${[['size', 'Sort: Largest First'], ['name', 'Sort: File Name'], ['new', 'Sort: Modified Date']].map(x => `
+              <option value="${x[0]}" ${S.lsort === x[0] ? 'selected' : ''}>${x[1]}</option>
+            `).join('')}
+          </select>
+        </div>
+        ${need()}
+        ${a.map((f, i) => `
+          <div class="rank">
+            <div class="no">${String(i + 1).padStart(2, '0')}</div>
+            <div>
+              <div style="font-size:16px;font-weight:700">${esc(f.name)}</div>
+              <div style="font-family:var(--font-mono);font-size:12px;color:var(--tx-muted);margin:2px 0 6px">${esc(f.path || f.name)}</div>
+              <div class="bar">
+                <i data-w="${(f.size / m) * 100}"></i>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--deep)">${fmt(f.size)}</div>
+              <span class="badge">${cat(f.name)}</span>
+            </div>
+          </div>
+        `).join('') || (S.hasData ? '<div class="empty-state"><h3>🎉 No Heavyweight Files Found</h3><p>No individual files exceed the 500 MB threshold.</p></div>' : '')}
+      </div>`;
+    }
+
+    function cleanV() {
+      const s = stats();
+      const R = [
+        ['dup', 'Duplicate Content', s.dup],
+        ['old', 'Stale & Unused Files', s.old],
+        ['temp', 'Temporary Caches & Logs', s.tmp]
+      ];
+      const tot = R.reduce((a, r) => a + (S.sel[r[0]] ? catBytes(r[0]) : 0), 0);
+      const l = compute().filter(f => f.role && S.sel[f.role]).sort((a, b) => b.size - a.size);
+
+      return `
+      <div class="wrap page">
+        ${head('004', 'Storage Cleanup Plan', 'Review candidates for disk deletion and calculate physical space savings.')}
+        ${need()}
+        ${S.hasData ? `
+          <div class="inv">
+            ${R.map(r => `
+              <div style="cursor:pointer" onclick="S.sel['${r[0]}']^=1;render()">
+                <div class="lbl">${r[1]}</div>
+                <div class="n">${fmt(catBytes(r[0]))}</div>
+                <div style="margin-top:14px">
+                  <span class="seg">
+                    <button class="${S.sel[r[0]] ? 'on' : ''}">
+                      ${S.sel[r[0]] ? '✓ Selected' : 'Excluded'}
+                    </button>
+                  </span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+          <div class="saved">
+            <div class="lbl" style="color:var(--deep)">Total Recoverable Drive Space</div>
+            <div class="huge" style="margin:10px 0">${gb(tot)}</div>
+            <button class="btn d" style="font-size:15px;padding:16px 28px" onclick="askClean()">
+              🗑️ Review & Permanently Delete Files →
+            </button>
+          </div>
+          <div style="margin-top:32px">
+            <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:14px;flex-wrap:wrap;gap:12px">
+              <div>
+                <h3 style="font-size:20px;margin:0 0 4px">Individual File Cleanup Decisions</h3>
+                <div style="font-size:13px;color:var(--tx-muted)">
+                  Toggle <b>Mark Delete / Keep</b> for batch cleanup, or click <b>Delete Now</b> on any file to immediately remove it from disk.
+                </div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn s l" onclick="markAll('delete')">Mark All for Deletion</button>
+                <button class="btn s l" onclick="markAll('keep')">Keep All</button>
+              </div>
+            </div>
+            <div class="card" style="padding:16px">
+              ${l.slice(0, 150).map(f => `
+                <div class="fl" style="align-items:center;padding:12px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:12px">
+                  <span style="flex:1;min-width:260px">
+                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                      <b>${esc(f.name)}</b>
+                      <span class="badge" style="background:${f.role === 'dup' ? 'var(--red-bg)' : f.role === 'old' ? 'var(--amb-bg)' : 'var(--blue-bg)'};color:${f.role === 'dup' ? 'var(--red)' : f.role === 'old' ? 'var(--amb)' : 'var(--blue)'};border-color:${f.role === 'dup' ? 'var(--red-border)' : f.role === 'old' ? 'var(--amb-border)' : 'var(--blue-border)'}">
+                        ${fmt(f.size)} &bull; ${{ dup: 'duplicate copy', old: 'unused file', temp: 'temporary cache' }[f.role] || f.role}
+                      </span>
+                    </div>
+                    <div style="font-family:var(--font-mono);font-size:12px;color:var(--tx-muted);margin-top:4px;word-break:break-all">${esc(f.path || f.name)}</div>
+                  </span>
+                  <span>${seg(f)}</span>
+                </div>
+              `).join('')}
+            </div>
+            ${l.length > 150 ? `<div style="font-size:12px;color:var(--tx-muted);text-align:right;margin-top:8px">Showing top 150 files of ${l.length} candidates</div>` : ''}
+          </div>
+        ` : ''}
+      </div>`;
+    }
+
+    function ba() {
+      const d = S.done;
+      if (!d) return `
+        <div class="card m">
+          <div class="lbl">Before vs. After Comparison</div>
+          <p style="margin:8px 0 0">Execute a disk cleanup to view the drive efficiency impact report.</p>
+        </div>`;
+      const b = d.before;
+      const a = d.after;
+
+      const col = (t, x) => `
+        <div class="card alt" style="margin:0">
+          <div class="lbl">${t} Storage</div>
+          <div class="huge" style="margin:10px 0">${gb(x.used)}</div>
+          <div class="bar t" style="margin:14px 0">
+            <i data-w="${(x.used / b.used) * 100}"></i>
+          </div>
+          <div style="font-size:14px;color:var(--tx-dim)">
+            <b>${fmt(x.dup)}</b> duplicates &bull; <b>${fmt(x.old + x.tmp)}</b> unused
+          </div>
+        </div>`;
+
+      return `
+      <div class="lbl">Drive Efficiency Shift</div>
+      <div class="ba">
+        ${col('Before Cleanup', b)}
+        <div>↓</div>
+        ${col('After Cleanup', a)}
+      </div>
+      <div class="saved">
+        <div class="huge">🌱 ${gb(d.saved)}</div>
+        <h3 style="font-size:24px;margin-top:8px">Physical Storage Recovered</h3>
+      </div>`;
+    }
+
+    function impactV() {
+      const s = stats();
+      const d = S.done;
+      const b = d ? d.saved : s.pot;
+      const i = imp(b);
+
+      return `
+      <div class="dark">
+        <div class="wrap page" style="padding-bottom:50px">
+          <div class="case" style="color:var(--mint)">
+            ${ic('leaf')} CASE FILE / 005
+            ${S.demo ? '<span class="badge">DEMO DATA</span>' : '<span class="badge green">REAL COMPUTATION</span>'}
+          </div>
+          <h1 class="huge">Smaller Storage.<br><span style="color:var(--br)">Lower Environmental Footprint.</span></h1>
+        </div>
+      </div>
+      <div class="wrap page" style="padding-top:24px">
+        <div class="lbl">
+          ${d ? '✓ Achieved Disk Space Freed' : 'Potential Savings Projection'} &bull; Estimates based on standard green metrics
+        </div>
+        <div class="metrics">
+          <div class="b2">
+            <div class="n">${num(b / 1e9, 1, ' GB')}</div>
+            <div class="lbl">${ic('drive')} Physical Storage Recovered</div>
+          </div>
+          <div class="b1">
+            <div class="n">${num(i.kwh, 3, ' kWh')}</div>
+            <div class="lbl">${ic('zap')} Est. Energy Saved / Year</div>
+          </div>
+          <div class="b3">
+            <div class="n">${num(i.g, 0, ' g')}</div>
+            <div class="lbl">${ic('leaf')} Est. CO₂ Reduced / Year</div>
+          </div>
+        </div>
+        <div class="card alt" style="font-size:13px;color:var(--tx-dim);line-height:1.7">
+          <b>Calculation Methodology:</b> Energy and CO₂ figures are calculated using configurable green computing benchmarks 
+          (<code>ENERGY_PER_GB_FACTOR = ${CFG.ENERGY_PER_GB_FACTOR} kWh/GB/year</code> and <code>CO2_KG_PER_KWH = ${CFG.CO2_KG_PER_KWH} kg CO₂/kWh</code>). 
+          Eliminating digital storage waste directly lowers drive write cycles, server replication overhead, and overall hardware wear.
+        </div>
+        <br>
+        ${S.hasData ? ba() : need()}
+      </div>
+      ${why()}`;
+    }
+
+    const V = {
+      home,
+      scan: scanV,
+      dup: dupV,
+      old: oldV,
+      large: largeV,
+      clean: cleanV,
+      impact: impactV
+    };
+
+    /* ---------- Actions ---------- */
+    function setAct(id, v) {
+      const f = S.files.find(x => x.id === id);
+      if (f) {
+        f.act = v;
+        if (v === 'delete') {
+          toast(`Marked "${f.name}" for batch deletion`);
+        } else {
+          toast(`Preserved "${f.name}" (excluded from deletion)`);
+        }
+        render();
+      }
+    }
+
+    function markAll(action) {
+      const l = compute().filter(f => f.role && S.sel[f.role]);
+      l.forEach(f => f.act = action);
+      toast(action === 'delete' ? `Marked ${l.length} file(s) for batch deletion` : `Preserved all ${l.length} file(s)`);
+      render();
+    }
+
+    function grpAct(g, v) {
+      let count = 0;
+      S.files.forEach(f => {
+        if (f.gid === g && f.role === 'dup') {
+          f.act = v;
+          count++;
+        }
+      });
+      toast(v === 'delete' ? `Marked ${count} duplicate copy(ies) in cluster #${g} for deletion` : `Preserved cluster #${g}`);
+      render();
+    }
+
+    async function deleteClusterDuplicates(g) {
+      const duplicates = S.files.filter(f => !f.gone && f.gid === g && f.role === 'dup');
+      if (!duplicates.length) return toast('No duplicates found in this cluster');
+
+      if (!confirm(`Permanently delete all ${duplicates.length} duplicate copy(ies) in cluster #${g} from disk?\n\nOriginal file will be safely preserved.`)) {
+        return;
+      }
+
+      toast(`Deleting ${duplicates.length} duplicate file(s)...`);
+      let deletedCount = 0;
+      for (const f of duplicates) {
+        let deleted = false;
+        if (f.handle || f.parentHandle || S.rootDirHandle) {
+          try {
+            deleted = await deleteFromHandle(f);
+          } catch (e) {}
+        }
+        if (!deleted) {
+          await checkEngine();
+          if (S.engineConnected && !S.demo) {
+            try {
+              const resp = await fetch(API_BASE + '/api/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ files: [f.path || f.name], baseDir: S.scannedFolder || '' })
+              });
+              const d = await resp.json();
+              if (d.success && d.deletedCount > 0) deleted = true;
+            } catch (e) {}
+          }
+        }
+        if (!deleted && S.demo) deleted = true;
+        if (deleted) {
+          f.gone = 1;
+          deletedCount++;
+        }
+      }
+
+      S.files = S.files.filter(f => !f.gone);
+      toast(`✓ Permanently deleted ${deletedCount} duplicate file(s)`);
+      render();
+    }
+
+    let API_BASE = '';
+
+    async function checkEngine() {
+      const endpoints = ['', 'http://127.0.0.1:8085', 'http://localhost:8085', 'http://127.0.0.1:8086', 'http://127.0.0.1:8087', 'http://127.0.0.1:8088'];
+      for (const base of endpoints) {
+        try {
+          const r = await fetch(base + '/api/status');
+          if (r.ok) {
+            const d = await r.json();
+            S.engineConnected = true;
+            S.serverInfo = d;
+            API_BASE = base;
+            return;
+          }
+        } catch (e) {}
+      }
+      S.engineConnected = false;
+    }
+
+    async function pick() {
+      await checkEngine();
+      if (S.engineConnected) {
+        showFolderSelectModal();
+      } else if (window.showDirectoryPicker) {
+        pickBrowser();
+      } else {
+        $('#picker').click();
+      }
+    }
+
+    function showFolderSelectModal() {
+      const quicks = (S.serverInfo && S.serverInfo.quickFolders) || [];
+      const m = document.createElement('div');
+      m.className = 'modal';
+      m.innerHTML = `
+      <div class="modal-card">
+        <button class="modal-close" id="pm_cx">✕</button>
+        <div class="case">${ic('folder')} GREENFILE LOCAL ENGINE</div>
+        <h2 style="font-size:26px;margin:8px 0 12px">Select Folder to Analyze</h2>
+        <p style="font-size:14px;color:var(--tx-dim);margin-bottom:20px">
+          Scans for duplicate content and wasted storage space. Selected files can be <b>permanently deleted from disk</b>.
+        </p>
+        <div style="margin-bottom:20px">
+          <button class="btn" id="pm_browse" style="width:100%;font-size:14px;padding:14px">
+            📂 Open Native Windows Folder Dialog →
+          </button>
+        </div>
+        ${quicks.length ? `
+          <div class="lbl" style="margin-bottom:8px">Quick Folders:</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+            ${quicks.map((q, idx) => `
+              <button class="btn s l pm_q" data-idx="${idx}">
+                ${q.icon} ${q.name}
+              </button>
+            `).join('')}
+          </div>
+        ` : ''}
+        <div class="lbl" style="margin-bottom:6px">Or Enter Folder Path:</div>
+        <div style="display:flex;gap:8px;margin-bottom:20px">
+          <input type="text" id="pm_path" placeholder="e.g. C:/Users/Username/Downloads" style="flex:1" value="${quicks[0] ? quicks[0].path : ''}">
+          <button class="btn s d" id="pm_go">Scan Path</button>
+        </div>
+        <div style="border-top:1.5px dashed var(--border);padding-top:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <button class="btn l s" id="pm_web">🌐 Browser Folder Picker</button>
+          <button class="btn l s" id="pm_demo">✨ Load Demo Data</button>
+        </div>
+      </div>`;
+      document.body.append(m);
+
+      m.querySelector('#pm_cx').onclick = () => m.remove();
+      m.querySelector('#pm_browse').onclick = async () => {
+        m.querySelector('#pm_browse').textContent = 'Opening Windows Folder Picker...';
+        try {
+          const bRes = await fetch(API_BASE + '/api/browse');
+          const bData = await bRes.json();
+          if (bData.ok && bData.folder) {
+            m.remove();
+            scanViaServer(bData.folder);
+            return;
+          }
+        } catch (err) {
+          console.warn('Browse error:', err);
+        }
+        m.querySelector('#pm_browse').textContent = '📂 Open Native Windows Folder Dialog →';
+      };
+
+      m.querySelectorAll('.pm_q').forEach(btn => {
+        btn.onclick = () => {
+          const q = quicks[+btn.dataset.idx];
+          if (q) {
+            m.remove();
+            scanViaServer(q.path);
+          }
+        };
+      });
+
+      m.querySelector('#pm_go').onclick = () => {
+        const p = m.querySelector('#pm_path').value.trim();
+        if (p) {
+          m.remove();
+          scanViaServer(p);
+        } else {
+          toast('Enter a valid directory path');
+        }
+      };
+
+      m.querySelector('#pm_web').onclick = () => {
+        m.remove();
+        pickBrowser();
+      };
+      m.querySelector('#pm_demo').onclick = () => {
+        m.remove();
+        startDemo();
+      };
+    }
+
+    async function scanViaServer(folderPath) {
+      S.demo = false;
+      S.done = null;
+      S.scannedFolder = folderPath;
+      prog(0, 10);
+      try {
+        const resp = await fetch(API_BASE + '/api/scan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ folder: folderPath })
+        });
+        prog(1, 35);
+        const data = await resp.json();
+        if (!data.success) {
+          S.scanning = null;
+          toast('Scan error: ' + (data.error || 'Failed to scan folder'));
+          render();
+          return;
+        }
+        prog(2, 60);
+        await wait(250);
+        prog(3, 85);
+        await wait(250);
+        prog(4, 95);
+        await wait(250);
+        S.files = (data.files || []).map(f => ({
+          name: f.name,
+          path: f.path,
+          relPath: f.relPath,
+          size: f.size,
+          mod: f.mod,
+          hash: f.hash,
+          tmp: f.tmp,
+          id: f.id || ('f_' + Math.random().toString(36).slice(2, 10))
+        }));
+        S.dupFolders = data.duplicateFolders || [];
+        S.emptyFolders = data.emptyFolders || [];
+        S.nameMatches = data.nameMatches || [];
+        if (S.dupFolders.length > 0) S.dupTab = 'folders';
+        else S.dupTab = 'files';
+        finish(Math.max(S.files.reduce((a, f) => a + f.size, 0) * 1.25, 1e9));
+      } catch (err) {
+        console.warn('Server scan error:', err);
+        S.scanning = null;
+        toast('Server communication error. Falling back to browser picker.');
+        pickBrowser();
+      }
+    }
+
+    async function pickBrowser() {
+      if (window.showDirectoryPicker) {
+        try {
+          const rootDir = await window.showDirectoryPicker({ mode: 'readwrite' });
+          S.rootDirHandle = rootDir;
+          await scanFromDirectoryHandle(rootDir);
+          return;
+        } catch (err) {
+          if (err.name === 'AbortError') return;
+          console.warn('showDirectoryPicker unavailable, fallback to file input', err);
+        }
+      }
+      $('#picker').click();
+    }
+
+    async function scanFromDirectoryHandle(dirHandle) {
+      S.demo = false;
+      S.done = null;
+      S.scannedFolder = dirHandle.name || 'Browser Folder';
+      prog(0, 8);
+      const isTmp = n => /\.(tmp|temp|log|bak|crdownload|cache)$/i.test(n) || n.startsWith('~') || n === '.DS_Store';
+      const list = [];
+      async function walk(dh, relPath = '') {
+        for await (const [name, entry] of dh.entries()) {
+          const curPath = relPath ? (relPath + '/' + name) : name;
+          if (entry.kind === 'file') {
+            try {
+              const f = await entry.getFile();
+              list.push({
+                name: f.name,
+                path: curPath,
+                size: f.size,
+                mod: f.lastModified,
+                tmp: isTmp(f.name),
+                id: 'f_' + Math.random().toString(36).slice(2, 10),
+                file: f,
+                handle: entry,
+                parentHandle: dh
+              });
+            } catch (e) {}
+          } else if (entry.kind === 'directory') {
+            if (name === '.git' || name === 'node_modules' || name === '.gemini') continue;
+            await walk(entry, curPath);
+          }
+        }
+      }
+      await walk(dirHandle);
+      if (!list.length) {
+        S.scanning = null;
+        toast('No files found in folder');
+        render();
+        return;
+      }
+      processScannedList(list);
+    }
+
+    $('#picker').onchange = e => {
+      if (e.target.files.length) {
+        const isTmp = n => /\.(tmp|temp|log|bak|crdownload|cache)$/i.test(n) || n.startsWith('~') || n === '.DS_Store';
+        const list = [...e.target.files].map(f => ({
+          name: f.name,
+          path: f.webkitRelativePath || f.name,
+          size: f.size,
+          mod: f.lastModified,
+          tmp: isTmp(f.name),
+          id: 'f_' + Math.random().toString(36).slice(2, 10),
+          file: f
+        }));
+        processScannedList(list);
+      }
+      e.target.value = '';
+    };
+
+    async function processScannedList(list) {
+      S.demo = false;
+      S.done = null;
+      prog(0, 10);
+      S.files = list;
+      S.base = 0;
+      await wait(300);
+      prog(1, 30);
+      const bs = {};
+      S.files.forEach(f => (bs[f.size] = bs[f.size] || []).push(f));
+      const cand = Object.values(bs).filter(l => l.length > 1).flat();
+      let k = 0;
+      for (const f of cand) {
+        if (f.size === 0) {
+          f.hash = 'empty_file_0';
+          continue;
+        }
+        try {
+          const lim = CFG.MAX_FULL_HASH_MB * 1e6;
+          const b = f.size <= lim ? f.file : new Blob([f.file.slice(0, 4e6), f.file.slice(f.size - 4e6)]);
+          const h = await crypto.subtle.digest('SHA-256', await b.arrayBuffer());
+          f.hash = [...new Uint8Array(h)].map(x => x.toString(16).padStart(2, '0')).join('') + f.size;
+        } catch (e) {}
+        if (++k % 5 === 0) prog(1, 30 + Math.round((k / cand.length) * 40));
+      }
+
+      // Group browser directory duplicates
+      const dirMap = {};
+      list.forEach(f => {
+        const parts = (f.path || f.name).replace(/\\/g, '/').split('/');
+        if (parts.length > 1) {
+          parts.pop();
+          let cur = '';
+          for (const p of parts) {
+            cur = cur ? (cur + '/' + p) : p;
+            (dirMap[cur] = dirMap[cur] || []).push(f);
+          }
+        }
+      });
+
+      const dirSigs = {};
+      Object.entries(dirMap).forEach(([dirPath, files]) => {
+        if (!files.length) return;
+        const subItems = files.map(f => {
+          const rel = f.path.startsWith(dirPath + '/') ? f.path.slice(dirPath.length + 1) : f.name;
+          return `${rel}:${f.size}:${f.hash || f.size}`;
+        }).sort();
+        const sig = subItems.join(';');
+        const totalSize = files.reduce((acc, x) => acc + x.size, 0);
+        (dirSigs[sig] = dirSigs[sig] || []).push({
+          path: dirPath,
+          name: dirPath.split('/').pop(),
+          fileCount: files.length,
+          totalSize
+        });
+      });
+
+      const dupFolders = [];
+      let dfId = 0;
+      Object.values(dirSigs).forEach(dList => {
+        if (dList.length < 2) return;
+        dList.sort((a, b) => scoreOriginality(b) - scoreOriginality(a));
+        dfId++;
+        dupFolders.push({
+          id: `df_${dfId}`,
+          original: dList[0],
+          duplicates: dList.slice(1),
+          fileCount: dList[0].fileCount,
+          size: dList[0].totalSize,
+          recoverableSize: dList[0].totalSize * (dList.length - 1)
+        });
+      });
+
+      S.dupFolders = dupFolders;
+      S.emptyFolders = [];
+      S.nameMatches = [];
+      if (S.dupFolders.length > 0) S.dupTab = 'folders';
+      else S.dupTab = 'files';
+
+      prog(2, 75);
+      await wait(300);
+      prog(3, 88);
+      await wait(300);
+      prog(4, 96);
+      await wait(300);
+      finish(Math.max(S.files.reduce((a, f) => a + f.size, 0) * 1.25, 1e9));
+    }
+
+    async function deleteFromHandle(f) {
+      if (f.parentHandle) {
+        try {
+          if (f.parentHandle.requestPermission) {
+            const p = await f.parentHandle.requestPermission({ mode: 'readwrite' });
+            if (p !== 'granted') return false;
+          }
+          await f.parentHandle.removeEntry(f.name);
+          return true;
+        } catch (e) {
+          console.warn('parentHandle removeEntry error:', e);
+        }
+      }
+
+      if (S.rootDirHandle) {
+        try {
+          if (S.rootDirHandle.requestPermission) {
+            const p = await S.rootDirHandle.requestPermission({ mode: 'readwrite' });
+            if (p !== 'granted') return false;
+          }
+          const cleanPath = (f.path || f.name).replace(/\\/g, '/');
+          const parts = cleanPath.split('/').filter(Boolean);
+          if (parts.length > 1 && parts[0] === S.rootDirHandle.name) {
+            parts.shift();
+          }
+          const fileName = parts.pop();
+          let cur = S.rootDirHandle;
+          for (const seg of parts) {
+            cur = await cur.getDirectoryHandle(seg);
+          }
+          await cur.removeEntry(fileName);
+          return true;
+        } catch (e) {
+          console.warn('rootDirHandle traverse removeEntry error:', e);
+        }
+      }
+      return false;
+    }
+
+    async function deleteSingleFile(id) {
+      const f = S.files.find(x => x.id === id) || S.files.find(x => (x.path || x.name) === id);
+      if (!f) return toast('File not found in current inventory');
+
+      if (!confirm(`Permanently delete this file from disk?\n\nFile: ${f.name}\nPath: ${f.path || f.name}\nSize: ${fmt(f.size)}`)) {
+        return;
+      }
+
+      toast(`Permanently deleting ${f.name}...`);
+      let deleted = false;
+      let errorMsg = '';
+
+      // 1. Attempt File System Access handle removal
+      if (f.handle || f.parentHandle || S.rootDirHandle) {
+        try {
+          deleted = await deleteFromHandle(f);
+        } catch (e) {
+          console.warn('Handle delete error:', e);
+          errorMsg = e.message;
+        }
+      }
+
+      // 2. Attempt Native Engine server removal
+      if (!deleted) {
+        await checkEngine();
+        if (S.engineConnected && !S.demo) {
+          try {
+            const resp = await fetch(API_BASE + '/api/delete', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                files: [f.path || f.name],
+                baseDir: S.scannedFolder || ''
+              })
+            });
+            const d = await resp.json();
+            if (d.success && d.deletedCount > 0) {
+              deleted = true;
+            } else if (d.failed && d.failed.length > 0) {
+              errorMsg = d.failed[0].error;
+            }
+          } catch (err) {
+            console.warn('Server delete error:', err);
+            errorMsg = err.message;
+          }
+        }
+      }
+
+      // 3. Demo mode removal
+      if (!deleted && S.demo) {
+        deleted = true;
+      }
+
+      if (deleted) {
+        f.gone = 1;
+        S.files = S.files.filter(x => x.id !== f.id);
+        if (S.nameMatches) {
+          S.nameMatches.forEach(nm => {
+            nm.files = nm.files.filter(x => x.id !== f.id);
+          });
+          S.nameMatches = S.nameMatches.filter(nm => nm.files.length > 1);
+        }
+        toast(`✓ "${f.name}" permanently deleted from disk`);
+        render();
+      } else {
+        toast(`⚠️ Could not delete file: ${errorMsg || 'Permission denied or file not found on disk'}`);
+      }
+    }
+
+    function deleteIndividualFile(pathOrId) {
+      deleteSingleFile(pathOrId);
+    }
+
+    async function deleteFolder(folderPath) {
+      if (!confirm(`Are you sure you want to permanently delete this duplicate folder and all its contents from disk?\n\nTarget: ${folderPath}`)) {
+        return;
+      }
+      let deleted = false;
+      let errorMsg = '';
+
+      if (S.rootDirHandle) {
+        try {
+          if (S.rootDirHandle.requestPermission) {
+            const p = await S.rootDirHandle.requestPermission({ mode: 'readwrite' });
+            if (p === 'granted') {
+              const clean = folderPath.replace(/\\/g, '/');
+              const parts = clean.split('/').filter(Boolean);
+              if (parts.length > 1 && parts[0] === S.rootDirHandle.name) {
+                parts.shift();
+              }
+              const folderName = parts.pop();
+              let cur = S.rootDirHandle;
+              for (const seg of parts) {
+                cur = await cur.getDirectoryHandle(seg);
+              }
+              await cur.removeEntry(folderName, { recursive: true });
+              deleted = true;
+            }
+          }
+        } catch (e) {
+          console.warn('Folder handle deletion error:', e);
+          errorMsg = e.message;
+        }
+      }
+
+      if (!deleted) {
+        await checkEngine();
+        if (S.engineConnected && !S.demo) {
+          try {
+            const resp = await fetch(API_BASE + '/api/delete', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ files: [folderPath], baseDir: S.scannedFolder || '' })
+            });
+            const d = await resp.json();
+            if (d.success && d.deletedCount > 0) {
+              deleted = true;
+            } else if (d.failed && d.failed.length > 0) {
+              errorMsg = d.failed[0].error;
+            }
+          } catch (err) {
+            errorMsg = err.message;
+          }
+        }
+      }
+
+      if (!deleted && S.demo) {
+        deleted = true;
+      }
+
+      if (deleted) {
+        toast(`✓ Duplicate folder permanently deleted from disk`);
+        S.dupFolders = S.dupFolders.filter(df => {
+          df.duplicates = df.duplicates.filter(dup => dup.path !== folderPath);
+          return df.duplicates.length > 0;
+        });
+        const normTarget = folderPath.replace(/\\/g, '/').toLowerCase();
+        S.files = S.files.filter(f => !(f.path || '').replace(/\\/g, '/').toLowerCase().startsWith(normTarget));
+        render();
+      } else {
+        toast(`⚠️ Could not delete folder: ${errorMsg || 'Permission denied'}`);
+      }
+    }
+
+    async function deleteEmptyFolder(folderPath) {
+      if (!confirm(`Permanently delete empty folder from disk?\n\n${folderPath}`)) return;
+      let deleted = false;
+      if (S.rootDirHandle) {
+        try {
+          const clean = folderPath.replace(/\\/g, '/');
+          const parts = clean.split('/').filter(Boolean);
+          if (parts.length > 1 && parts[0] === S.rootDirHandle.name) parts.shift();
+          const folderName = parts.pop();
+          let cur = S.rootDirHandle;
+          for (const seg of parts) cur = await cur.getDirectoryHandle(seg);
+          await cur.removeEntry(folderName);
+          deleted = true;
+        } catch (e) {}
+      }
+
+      if (!deleted) {
+        await checkEngine();
+        if (S.engineConnected && !S.demo) {
+          try {
+            const resp = await fetch(API_BASE + '/api/delete', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ files: [folderPath], baseDir: S.scannedFolder || '' })
+            });
+            const d = await resp.json();
+            if (d.success && d.deletedCount > 0) deleted = true;
+          } catch (err) {}
+        }
+      }
+
+      if (!deleted && S.demo) deleted = true;
+
+      if (deleted) {
+        toast(`✓ Empty folder deleted`);
+        S.emptyFolders = S.emptyFolders.filter(ef => ef.path !== folderPath);
+        render();
+      } else {
+        toast(`⚠️ Could not delete empty folder`);
+      }
+    }
+
+    async function deleteAllEmptyFolders() {
+      if (!confirm(`Delete all ${S.emptyFolders.length} empty folder(s) from disk?`)) return;
+      await checkEngine();
+      if (S.engineConnected && !S.demo) {
+        try {
+          const paths = S.emptyFolders.map(ef => ef.path);
+          const resp = await fetch(API_BASE + '/api/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ files: paths, baseDir: S.scannedFolder || '' })
+          });
+          const d = await resp.json();
+          if (d.success) {
+            toast(`✓ Deleted ${d.deletedCount} empty folder(s)`);
+            S.emptyFolders = [];
+            render();
+          }
+        } catch (err) {}
+      } else if (S.demo) {
+        toast(`✓ [Demo Mode] All empty folders removed`);
+        S.emptyFolders = [];
+        render();
+      }
+    }
+
+    const go = v => {
+      S.view = v;
+      render();
+      window.scrollTo(0, 0);
+    };
+
+    function askClean() {
+      compute();
+      const t = S.files.filter(f => !f.gone && f.role && S.sel[f.role] && f.act !== 'keep');
+      if (!t.length) return toast('Nothing selected – choose categories or files first');
+      const sz = t.reduce((a, f) => a + f.size, 0);
+      const m = document.createElement('div');
+      m.className = 'modal';
+      m.innerHTML = `
+      <div class="modal-card">
+        <button class="modal-close" id="cx">✕</button>
+        <div class="case" style="color:var(--red)">⚠️ PERMANENT DISK DELETION</div>
+        <h2 style="font-size:26px;margin:10px 0 12px">Permanently Delete Files?</h2>
+        <p style="color:var(--tx-dim);line-height:1.6">
+          This will permanently delete <b>${t.length} file(s)</b> from your hard drive and recover 
+          <b style="color:var(--mid);font-size:16px">${fmt(sz)}</b> of physical drive storage.
+        </p>
+        ${S.scannedFolder ? `<div style="font-size:13px;background:var(--surface-alt);padding:8px 12px;border-radius:var(--radius-sm);margin:12px 0;font-family:var(--font-mono)">Target: <b>${esc(S.scannedFolder)}</b></div>` : ''}
+        <div style="background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;margin:16px 0">
+          ⚠️ Action cannot be undone. Files will be permanently removed from disk.
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end">
+          <button class="btn l s" id="cx_btn">Cancel</button>
+          <button class="btn r" id="ok">Permanently Delete</button>
+        </div>
+      </div>`;
+      document.body.append(m);
+
+      m.querySelector('#cx').onclick = () => m.remove();
+      m.querySelector('#cx_btn').onclick = () => m.remove();
+
+      m.querySelector('#ok').onclick = async () => {
+        const okBtn = m.querySelector('#ok');
+        okBtn.disabled = true;
+        okBtn.textContent = 'Permanently deleting...';
+        const before = stats();
+        let deletedCount = 0;
+        let failed = [];
+
+        await checkEngine();
+
+        // 1. Process files with browser directory handles first
+        const remainingTargets = [];
+        for (const f of t) {
+          let handleDeleted = false;
+          if (f.handle || f.parentHandle || S.rootDirHandle) {
+            try {
+              handleDeleted = await deleteFromHandle(f);
+            } catch (err) {
+              console.warn('Batch handle delete failed for:', f.name, err);
+            }
+          }
+          if (handleDeleted) {
+            f.gone = 1;
+            deletedCount++;
+          } else {
+            remainingTargets.push(f);
+          }
+        }
+
+        // 2. Process remaining targets with Server Engine
+        if (remainingTargets.length > 0 && S.engineConnected && !S.demo) {
+          try {
+            const fileTargets = remainingTargets.map(f => f.path || f.name);
+            const resp = await fetch(API_BASE + '/api/delete', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ files: fileTargets, baseDir: S.scannedFolder || '' })
+            });
+            const d = await resp.json();
+            if (d.success) {
+              const normP = p => (p || '').replace(/\\/g, '/').toLowerCase();
+              const deletedSet = new Set((d.deleted || []).map(normP));
+              for (const f of remainingTargets) {
+                if (deletedSet.has(normP(f.path)) || deletedSet.has(normP(f.name))) {
+                  f.gone = 1;
+                  deletedCount++;
+                } else {
+                  failed.push({ path: f.name, error: 'Could not delete from disk' });
+                }
+              }
+            } else {
+              remainingTargets.forEach(f => failed.push({ path: f.name, error: d.error || 'Server deletion failed' }));
+            }
+          } catch (err) {
+            console.error('Server delete call failed:', err);
+            remainingTargets.forEach(f => failed.push({ path: f.name, error: err.message }));
+          }
+        } else if (remainingTargets.length > 0 && S.demo) {
+          remainingTargets.forEach(f => {
+            f.gone = 1;
+            deletedCount++;
+          });
+        } else if (remainingTargets.length > 0) {
+          remainingTargets.forEach(f => failed.push({ path: f.name, error: 'No handle or native engine available' }));
+        }
+
+        S.files = S.files.filter(f => !f.gone);
+        if (S.nameMatches) {
+          S.nameMatches.forEach(nm => {
+            nm.files = nm.files.filter(f => !f.gone);
+          });
+          S.nameMatches = S.nameMatches.filter(nm => nm.files.length > 1);
+        }
+
+        const actualFreed = t.filter(f => f.gone).reduce((a, f) => a + f.size, 0);
+        S.done = { before, after: stats(), saved: actualFreed };
+        m.remove();
+        render();
+
+        if (failed.length > 0) {
+          toast('⚠️ ' + failed.length + ' file(s) could not be deleted from disk');
+        }
+
+        if (deletedCount > 0) {
+          const i = imp(actualFreed);
+          const o = document.createElement('div');
+          o.className = 'modal';
+          o.innerHTML = `
+          <div class="modal-card" style="text-align:center;max-width:540px">
+            <div style="font-size:48px;margin-bottom:12px">🌱</div>
+            <div class="lbl mint" style="background:var(--deep);color:var(--br);padding:4px 12px;border-radius:var(--radius-full);display:inline-block">
+              Cleanup Protocol Complete
+            </div>
+            <h2 class="xl" style="margin:16px 0 8px">Storage Freed!</h2>
+            <div style="font-family:var(--font-display);font-size:36px;font-weight:800;color:var(--mid);margin-bottom:18px">
+              ${fmt(actualFreed)} Recovered
+            </div>
+            <div class="metrics" style="margin:20px 0">
+              <div>
+                <div class="n" style="font-size:28px">${fmt(actualFreed)}</div>
+                <div class="lbl">Deleted from Disk</div>
+              </div>
+              <div>
+                <div class="n" style="font-size:28px">${i.kwh.toFixed(3)} kWh</div>
+                <div class="lbl">Est. Energy Saved</div>
+              </div>
+              <div>
+                <div class="n" style="font-size:28px">${i.g.toFixed(0)} g</div>
+                <div class="lbl">Est. CO₂ Reduced</div>
+              </div>
+            </div>
+            <p style="color:var(--tx-dim);font-size:14px;margin-bottom:24px">
+              ${deletedCount} file(s) have been permanently deleted from your local storage.
+            </p>
+            <div style="display:flex;gap:12px;justify-content:center">
+              <button class="btn d" id="v">View Environmental Impact →</button>
+              <button class="btn l" id="cl">Close</button>
+            </div>
+          </div>`;
+          document.body.append(o);
+          o.querySelector('#v').onclick = () => {
+            o.remove();
+            go('impact');
+          };
+          o.querySelector('#cl').onclick = () => o.remove();
+        }
+      };
+    }
+
+    /* ---------- Render & Motion ---------- */
+    function motion() {
+      document.querySelectorAll('.cnt').forEach(e => {
+        const v = +e.dataset.v;
+        const d = +e.dataset.d;
+        const t0 = performance.now();
+        (function st(t) {
+          const p = Math.min(1, (t - t0) / 1200);
+          e.textContent = (v * (1 - Math.pow(1 - p, 3))).toFixed(d) + e.dataset.u;
+          if (p < 1) requestAnimationFrame(st);
+        })(t0);
+      });
+
+      const io = new IntersectionObserver(es => {
+        es.forEach(x => {
+          if (x.isIntersecting) {
+            x.target.querySelectorAll('[data-w]').forEach(b => {
+              b.style.width = b.dataset.w + '%';
+            });
+            io.unobserve(x.target);
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('.card, .strip, .metrics, .rank').forEach(e => io.observe(e));
+      document.querySelectorAll('[data-w]').forEach(b => {
+        setTimeout(() => b.style.width = b.dataset.w + '%', 80);
+      });
+    }
+
+    function render() {
+      const q = document.activeElement && document.activeElement.id === 'q';
+      const badge = S.engineConnected
+        ? `<div class="status-pill active" title="Local server connected with native disk deletion support"><span class="dot"></span> ENGINE ACTIVE</div>`
+        : `<div class="status-pill browser" title="Running in browser sandbox mode. Run start.bat for direct disk deletion."><span class="dot"></span> BROWSER MODE</div>`;
+
+      $('#nav').innerHTML = `
+        <div class="brand" onclick="go('home')">
+          <div class="brand-icon">${ic('leaf')}</div>
+          <span>GREENFILE</span>
+        </div>
+        ${badge}
+        <div class="nav-tabs">
+          ${NAV.map(n => `
+            <button class="${S.view === n[0] ? 'on' : ''}" onclick="go('${n[0]}')">
+              ${n[1]}
+            </button>
+          `).join('')}
+        </div>`;
+
+      $('#app').innerHTML = V[S.view]();
+      motion();
+
+      if (q) {
+        const e = $('#q');
+        e.focus();
+        e.setSelectionRange(e.value.length, e.value.length);
+      }
+    }
+
+    checkEngine().then(() => render());
+  </script>
+</body>
+</html>
